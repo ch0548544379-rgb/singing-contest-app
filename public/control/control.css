@@ -1,0 +1,73 @@
+.wrap { max-width: 1100px; margin: 0 auto; padding: 24px; }
+header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+h1 { font-size: 1.6rem; margin: 0; }
+.header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.section { padding: 20px 24px; margin-bottom: 22px; }
+.section h2 { margin-top: 0; font-size: 1.25rem; color: var(--gold-soft); }
+.hint { color: var(--muted); font-size: 0.92rem; }
+
+.btn { border: 1px solid var(--accent); background: var(--accent); color: white; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-size: 0.95rem; text-decoration: none; display: inline-block; }
+.btn.ghost { background: transparent; border-color: rgba(242,193,78,0.5); color: var(--gold-soft); }
+.btn.primary { background: var(--gold); border-color: var(--gold); color: #1a1200; font-weight: bold; }
+.btn.danger { background: var(--accent2); border-color: var(--accent2); }
+.btn.tiny { padding: 4px 10px; font-size: 0.8rem; }
+.btn.small { padding: 6px 14px; font-size: 0.85rem; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.url-row { display: flex; align-items: center; gap: 10px; margin: 6px 0; flex-wrap: wrap; font-size: 0.9rem; }
+.url-row code { background: #000; padding: 4px 10px; border-radius: 6px; color: var(--gold-soft); direction: ltr; }
+
+.roster-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.roster-slot { display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.3); padding: 8px 10px; border-radius: 10px; }
+.roster-slot .slot-num { color: var(--gold-soft); font-weight: bold; width: 22px; }
+.roster-slot input { flex: 1; background: transparent; border: none; border-bottom: 1px solid var(--muted); color: var(--text); padding: 6px 4px; }
+.roster-slot input:focus { outline: none; border-color: var(--gold); }
+
+.row { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
+.wrap-row { flex-wrap: wrap; }
+.performer-pick { padding: 10px 18px; border-radius: 10px; border: 1px solid var(--accent); background: transparent; color: var(--text); cursor: pointer; }
+.performer-pick.active { background: var(--gold); color: #1a1200; border-color: var(--gold); font-weight: bold; }
+.current-performer { margin-top: 8px; color: var(--muted); }
+
+.judges-box { margin-top: 16px; padding: 16px; border-radius: 12px; background: rgba(242,193,78,0.08); border: 1px solid rgba(242,193,78,0.4); }
+.judges-box-title { font-weight: bold; color: var(--gold-soft); margin-bottom: 10px; }
+.saved-note { color: #6be36b; font-weight: bold; }
+.stage-label { display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; color: var(--muted); }
+
+.round-create { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+.round-create input, .round-create select { background: rgba(0,0,0,0.35); border: 1px solid var(--muted); color: var(--text); padding: 8px 10px; border-radius: 8px; }
+
+.participant-pick { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--muted); background: transparent; color: var(--text); cursor: pointer; }
+.participant-pick.selected { border-color: var(--gold); background: rgba(242,193,78,0.15); color: var(--gold-soft); }
+
+.round-panel { margin-top: 18px; border-top: 1px solid rgba(242,193,78,0.2); padding-top: 16px; }
+.round-panel.hidden { display: none; }
+.scores-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+.scores-table th, .scores-table td { padding: 8px 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.scores-table input { width: 70px; background: rgba(0,0,0,0.35); border: 1px solid var(--muted); color: var(--text); padding: 4px 6px; border-radius: 6px; text-align: center; }
+.scores-table tr.current-row { background: rgba(242,193,78,0.08); }
+
+.voting-controls { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
+.status { padding: 4px 12px; border-radius: 999px; background: rgba(255,255,255,0.08); }
+.status.open { background: var(--accent2); color: white; }
+
+.manual-vote-buttons { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 16px; }
+.manual-vote-buttons button { width: 54px; height: 54px; border-radius: 50%; border: 1px solid var(--gold); background: rgba(242,193,78,0.1); color: var(--gold-soft); font-size: 1.2rem; cursor: pointer; }
+.manual-vote-buttons button:hover { background: var(--gold); color: #1a1200; }
+.manual-vote-buttons .vote-tally { display:flex; align-items:center; padding: 0 10px; color: var(--muted); }
+
+.close-round { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+#rankPreview { display: flex; flex-direction: column; gap: 4px; width: 100%; margin: 8px 0; }
+.rank-row { display: flex; justify-content: space-between; padding: 6px 12px; background: rgba(0,0,0,0.3); border-radius: 6px; }
+.rank-row label { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+
+.song-setup { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.song-setup input { background: rgba(0,0,0,0.35); border: 1px solid var(--muted); color: var(--text); padding: 8px 10px; border-radius: 8px; flex: 1; min-width: 160px; }
+.song-counters { display: flex; gap: 16px; flex-wrap: wrap; margin: 10px 0; }
+.song-counter { padding: 12px 16px; background: rgba(0,0,0,0.3); border-radius: 10px; text-align: center; min-width: 160px; }
+.song-counter .name { font-weight: bold; margin-bottom: 6px; }
+.song-counter .controls { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.song-counter input { width: 60px; text-align: center; background: rgba(0,0,0,0.4); border: 1px solid var(--muted); color: var(--text); border-radius: 6px; padding: 4px; }
+
+#winnerSelect { background: rgba(0,0,0,0.35); border: 1px solid var(--muted); color: var(--text); padding: 8px 10px; border-radius: 8px; }

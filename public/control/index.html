@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>פאנל ניהול - תחרות השירה</title>
+<link rel="stylesheet" href="/shared/theme.css">
+<link rel="stylesheet" href="control.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 class="glow-text">פאנל ניהול תחרות השירה</h1>
+    <div class="header-actions">
+      <button id="soundStartBtn" class="btn ghost">🔊 הפעל סאונד (גם על מסך זה)</button>
+      <button id="musicMuteBtn" class="btn ghost">🔇 השתק מוזיקת רקע במסך הקהל</button>
+      <a href="/display/" target="_blank" class="btn ghost">↗ פתח מסך קהל</a>
+      <button id="resetBtn" class="btn danger">איפוס כללי</button>
+    </div>
+  </header>
+
+  <section class="panel section">
+    <h2>📞 חיבור קו טלפון (ימות המשיח)</h2>
+    <p class="hint">כשיהיה לך קו מ"ימות המשיח", הדביקו את הכתובת הבאה בשדה <b>api_link</b> בהגדרות השלוחה מסוג <b>API</b>. השלוחה תקריא למתקשר את שם המבצע הפעיל, תבקש ממנו להקיש ציון בין 1 ל-10, ותשמור את ההצבעה (עם הגנה מהצבעה כפולה של אותו מספר לאותו זמר). גם בלי חיבור טלפון אמיתי - ההצבעה הידנית למטה בכל סבב עובדת באותה מדויקות בדיוק.</p>
+    <div class="url-row"><span>כתובת ה-api_link:</span><code id="urlVote">-</code><button class="btn tiny" data-copy="urlVote">העתק</button></div>
+  </section>
+
+  <section class="panel section">
+    <h2>🎤 רשימת משתתפים (9 שלוחות)</h2>
+    <div class="roster-grid" id="rosterGrid"></div>
+  </section>
+
+  <section class="panel section">
+    <h2>🎯 מי על הבמה עכשיו</h2>
+    <div class="row wrap-row" id="performerButtons"></div>
+    <div class="current-performer">מבצע פעיל: <b id="currentPerformerLabel">אין</b></div>
+
+    <div class="judges-box" id="judgesBox">
+      <div class="judges-box-title">📝 כאן מקלידים את ניקוד השופטים (המספר שהם אומרים לך בעל פה) עבור המבצע הפעיל:</div>
+      <div class="row wrap-row">
+        <input id="judgesScoreInput" type="number" min="0" placeholder="לדוגמה: 24" style="width:110px; font-size:1.3rem;">
+        <button id="saveJudgesScoreBtn" class="btn primary">שמור ניקוד שופטים</button>
+        <span id="judgesSavedNote" class="saved-note"></span>
+      </div>
+      <p class="hint" id="judgesBoxHint">כדי להזין ניקוד - קודם צריך ליצור סבב למטה ולבחור מבצע פעיל.</p>
+    </div>
+  </section>
+
+  <section class="panel section">
+    <h2>🏆 ניהול סבב</h2>
+    <div class="round-create">
+      <input id="roundName" placeholder="שם השלב, לדוגמה: שלב 1" value="שלב 1">
+      <label class="stage-label">שלב תחרות (קובע כמה דרמטי המסך והמוזיקה):
+      <select id="roundStage">
+        <option value="1">שלב 1 - מוקדמות (רגוע)</option>
+        <option value="2">שלב 2 - חצי גמר (יותר דרמטי)</option>
+        <option value="3">שלב 3 - גמר (הכי דרמטי)</option>
+      </select>
+      </label>
+      <label>שופטים:
+        <select id="judgesCount">
+          <option value="2">2</option>
+          <option value="3" selected>3</option>
+        </select>
+      </label>
+      <label>מקסימום לשופט: <input id="judgesPerMax" type="number" value="10" min="1" style="width:70px"></label>
+      <label>סה"כ מקס' שופטים: <input id="judgesMax" type="number" value="30" min="1" style="width:70px"></label>
+      <button id="createRoundBtn" class="btn primary">צור סבב חדש</button>
+    </div>
+    <div class="row wrap-row" id="participantPicker"></div>
+
+    <div id="roundPanel" class="round-panel hidden">
+      <h3 id="roundTitle"></h3>
+      <table class="scores-table">
+        <thead><tr><th>משתתף</th><th>נקודות שופטים</th><th>הצבעות קהל</th><th>ממוצע קהל</th><th>נקודות משוקללות</th><th>סה"כ</th></tr></thead>
+        <tbody id="scoresBody"></tbody>
+      </table>
+
+      <div class="voting-controls">
+        <button id="voteOpenBtn" class="btn primary">פתח הצבעת קהל למבצע הנוכחי</button>
+        <button id="voteCloseBtn" class="btn ghost">סגור הצבעה</button>
+        <span id="votingStatus" class="status">סגור</span>
+      </div>
+      <div class="manual-vote-buttons" id="manualVoteButtons"></div>
+
+      <div class="close-round">
+        <label>כמה עולים לשלב הבא: <input id="advanceCount" type="number" value="3" min="0" style="width:60px"></label>
+        <button id="computeRankBtn" class="btn ghost">חשב דירוג</button>
+        <div id="rankPreview"></div>
+        <button id="closeRoundBtn" class="btn primary">סגור סבב ועדכן מסך</button>
+        <button id="startNextRoundBtn" class="btn primary hidden">➡ הכן את הסבב הבא</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel section">
+    <h2>🎵 בחירת שיר (הצבעה ידנית בהרמת ידיים)</h2>
+    <div class="song-setup" id="songSetup">
+      <input class="songNameInput" placeholder="שם שיר 1">
+      <input class="songNameInput" placeholder="שם שיר 2">
+      <input class="songNameInput" placeholder="שם שיר 3 (אופציונלי)">
+      <input class="songNameInput" placeholder="שם שיר 4 (אופציונלי)">
+      <button id="startSongBtn" class="btn primary">התחל הצבעת שיר</button>
+    </div>
+    <div id="songCounters" class="song-counters"></div>
+    <button id="revealSongBtn" class="btn ghost">חשוף שיר נבחר</button>
+  </section>
+
+  <section class="panel section">
+    <h2>🖥️ שליטה כללית במסך</h2>
+    <div class="row wrap-row">
+      <button class="btn ghost" data-mode="idle">מסך פתיחה</button>
+      <button class="btn ghost" data-mode="performer">מסך מבצע</button>
+      <button class="btn ghost" data-mode="results">מסך תוצאות</button>
+      <button class="btn ghost" data-mode="songSelect">מסך בחירת שיר</button>
+    </div>
+    <div class="row wrap-row">
+      <label>רמת דרמה על המסך (1=רגוע, 3=הכי דרמטי, גם במוזיקה וגם באנימציה): </label>
+      <input id="stageSlider" type="range" min="1" max="3" value="1">
+      <span id="stageValue">1</span>
+    </div>
+    <div class="row wrap-row">
+      <select id="winnerSelect"></select>
+      <button id="announceWinnerBtn" class="btn danger">🏆 הכרז על הזוכה הסופי!</button>
+    </div>
+  </section>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/shared/audio.js"></script>
+<script src="control.js"></script>
+</body>
+</html>

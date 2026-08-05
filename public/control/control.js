@@ -1,0 +1,352 @@
+const socket = io();
+let lastState = null;
+let selectedParticipantIds = new Set();
+let lastRankPreview = null;
+
+// ---- כתובות אינטגרציה לימות המשיח ----
+document.getElementById('urlVote').textContent = location.origin + '/api/yemot/';
+document.querySelectorAll('[data-copy]').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const text = document.getElementById(btn.dataset.copy).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'הועתק!';
+      setTimeout(() => (btn.textContent = 'העתק'), 1200);
+    });
+  });
+});
+
+document.getElementById('soundStartBtn').addEventListener('click', () => {
+  StageAudio.start();
+});
+
+document.getElementById('musicMuteBtn').addEventListener('click', () => {
+  if (!lastState) return;
+  socket.emit('display:setMusicMuted', { muted: !lastState.display.musicMuted });
+});
+
+function renderMusicMuteBtn(state) {
+  const btn = document.getElementById('musicMuteBtn');
+  const muted = !!(state.display && state.display.musicMuted);
+  btn.textContent = muted ? '🔊 הפעל מוזיקת רקע במסך הקהל' : '🔇 השתק מוזיקת רקע במסך הקהל';
+  btn.classList.toggle('primary', muted);
+}
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if (confirm('לאפס את כל נתוני התחרות? פעולה זו לא ניתנת לביטול.')) {
+    socket.emit('state:reset');
+  }
+});
+
+// ---- רשימת משתתפים ----
+function renderRoster(state) {
+  const grid = document.getElementById('rosterGrid');
+  grid.innerHTML = '';
+  state.roster.forEach((slot) => {
+    const div = document.createElement('div');
+    div.className = 'roster-slot';
+    div.innerHTML = `<span class="slot-num">${slot.slot}</span><input value="${slot.name || ''}" placeholder="שם משתתף">`;
+    const input = div.querySelector('input');
+    input.addEventListener('change', () => {
+      socket.emit('roster:set', { slot: slot.slot, name: input.value });
+    });
+    grid.appendChild(div);
+  });
+}
+
+// ---- מבצע נוכחי ----
+function renderPerformerButtons(state) {
+  const wrap = document.getElementById('performerButtons');
+  wrap.innerHTML = '';
+  state.roster.filter((r) => r.id).forEach((r) => {
+    const btn = document.createElement('button');
+    btn.className = 'performer-pick' + (state.currentPerformerId === r.id ? ' active' : '');
+    btn.textContent = r.name;
+    btn.addEventListener('click', () => socket.emit('performer:set', { contestantId: r.id }));
+    wrap.appendChild(btn);
+  });
+  const current = state.roster.find((r) => r.id === state.currentPerformerId);
+  document.getElementById('currentPerformerLabel').textContent = current ? current.name : 'אין';
+  renderJudgesBox(state);
+}
+
+// ---- תיבת הזנת ניקוד שופטים (בולטת, ליד "מי על הבמה עכשיו") ----
+function renderJudgesBox(state) {
+  const round = state.rounds.find((r) => r.id === state.currentRoundId);
+  const input = document.getElementById('judgesScoreInput');
+  const saveBtn = document.getElementById('saveJudgesScoreBtn');
+  const hint = document.getElementById('judgesBoxHint');
+  const ready = !!(round && state.currentPerformerId && round.participantIds.includes(state.currentPerformerId));
+  input.disabled = !ready;
+  saveBtn.disabled = !ready;
+  if (!ready) {
+    hint.textContent = !round
+      ? 'כדי להזין ניקוד - קודם צריך ליצור סבב למטה (בקטע "ניהול סבב") ולבחור מבצע פעיל מתוך אותו סבב.'
+      : 'המבצע הפעיל לא נמצא ברשימת המשתתפים של הסבב הנוכחי.';
+  } else {
+    hint.textContent = '';
+    const existing = round.results[state.currentPerformerId] && round.results[state.currentPerformerId].judgesTotal;
+    if (document.activeElement !== input) {
+      input.value = existing != null ? existing : '';
+    }
+  }
+}
+
+document.getElementById('saveJudgesScoreBtn').addEventListener('click', () => {
+  const round = lastState.rounds.find((r) => r.id === lastState.currentRoundId);
+  if (!round || !lastState.currentPerformerId) return;
+  const val = document.getElementById('judgesScoreInput').value;
+  if (val === '') return;
+  socket.emit('round:setJudges', { roundId: round.id, contestantId: lastState.currentPerformerId, judgesTotal: val });
+  const note = document.getElementById('judgesSavedNote');
+  note.textContent = '✓ נשמר';
+  setTimeout(() => (note.textContent = ''), 2000);
+});
+
+// ---- יצירת סבב: בחירת משתתפים ----
+function renderParticipantPicker(state) {
+  const wrap = document.getElementById('participantPicker');
+  wrap.innerHTML = '';
+  state.roster.filter((r) => r.id).forEach((r) => {
+    const btn = document.createElement('button');
+    btn.className = 'participant-pick' + (selectedParticipantIds.has(r.id) ? ' selected' : '');
+    btn.textContent = r.name;
+    btn.addEventListener('click', () => {
+      if (selectedParticipantIds.has(r.id)) selectedParticipantIds.delete(r.id);
+      else selectedParticipantIds.add(r.id);
+      renderParticipantPicker(state);
+    });
+    wrap.appendChild(btn);
+  });
+}
+
+function recalcJudgesMax() {
+  const count = Number(document.getElementById('judgesCount').value);
+  const perMax = Number(document.getElementById('judgesPerMax').value);
+  document.getElementById('judgesMax').value = count * perMax;
+}
+document.getElementById('judgesCount').addEventListener('change', recalcJudgesMax);
+document.getElementById('judgesPerMax').addEventListener('change', recalcJudgesMax);
+
+document.getElementById('createRoundBtn').addEventListener('click', () => {
+  if (selectedParticipantIds.size < 2) {
+    alert('יש לבחור לפחות שני משתתפים לסבב');
+    return;
+  }
+  socket.emit('round:create', {
+    name: document.getElementById('roundName').value || 'סבב',
+    stageLevel: Number(document.getElementById('roundStage').value),
+    participantIds: Array.from(selectedParticipantIds),
+    judgesMax: Number(document.getElementById('judgesMax').value) || 30,
+  });
+  selectedParticipantIds.clear();
+});
+
+// ---- פאנל סבב פעיל ----
+function computeCombined(round, cid) {
+  const r = round.results[cid] || { judgesTotal: 0, audienceVotes: [] };
+  const votes = r.audienceVotes || [];
+  const avg = votes.length ? votes.reduce((a, b) => a + b, 0) / votes.length : 0;
+  const norm = (avg / 10) * round.judgesMax;
+  return { judgesTotal: r.judgesTotal || 0, avg, norm, combined: (r.judgesTotal || 0) + norm, count: votes.length };
+}
+
+function renderRoundPanel(state) {
+  const round = state.rounds.find((r) => r.id === state.currentRoundId);
+  const panel = document.getElementById('roundPanel');
+  if (!round) {
+    panel.classList.add('hidden');
+    return;
+  }
+  panel.classList.remove('hidden');
+  document.getElementById('roundTitle').textContent = `${round.name} (שלב ${round.stageLevel}) ${round.closed ? '— נסגר' : ''}`;
+
+  const tbody = document.getElementById('scoresBody');
+  tbody.innerHTML = '';
+  round.participantIds.forEach((cid) => {
+    const c = state.roster.find((r) => r.id === cid);
+    const calc = computeCombined(round, cid);
+    const tr = document.createElement('tr');
+    if (cid === state.currentPerformerId) tr.className = 'current-row';
+    tr.innerHTML = `
+      <td>${c ? c.name : ''}</td>
+      <td><input type="number" min="0" max="${round.judgesMax}" value="${round.results[cid] ? (round.results[cid].judgesTotal ?? '') : ''}" data-cid="${cid}" class="judges-input"></td>
+      <td>${calc.count}</td>
+      <td>${calc.avg.toFixed(2)}</td>
+      <td>${calc.norm.toFixed(1)}</td>
+      <td><b>${calc.combined.toFixed(1)}</b></td>`;
+    tbody.appendChild(tr);
+  });
+  tbody.querySelectorAll('.judges-input').forEach((input) => {
+    input.addEventListener('change', () => {
+      socket.emit('round:setJudges', { roundId: round.id, contestantId: input.dataset.cid, judgesTotal: input.value });
+    });
+  });
+
+  document.getElementById('votingStatus').textContent = round.votingOpen ? 'הצבעה פתוחה' : 'סגור';
+  document.getElementById('votingStatus').className = 'status' + (round.votingOpen ? ' open' : '');
+  document.getElementById('voteOpenBtn').disabled = round.votingOpen || !state.currentPerformerId || round.closed;
+  document.getElementById('voteCloseBtn').disabled = !round.votingOpen;
+
+  renderManualVoteButtons(state, round);
+
+  const nextBtn = document.getElementById('startNextRoundBtn');
+  if (round.closed && round.advancers.length) {
+    nextBtn.classList.remove('hidden');
+    nextBtn.textContent = `➡ הכן את הסבב הבא עם ${round.advancers.length} המדורגים`;
+  } else {
+    nextBtn.classList.add('hidden');
+  }
+}
+
+// ממלא אוטומטית את בוחר המשתתפים עם העולים מהסבב שנסגר, ומציע שם לסבב הבא -
+// כדי לא לחזור ולסמן ידנית את אותם שמות שכבר נבחרו בחישוב הדירוג.
+document.getElementById('startNextRoundBtn').addEventListener('click', () => {
+  const round = lastState.rounds.find((r) => r.id === lastState.currentRoundId);
+  if (!round || !round.closed) return;
+  selectedParticipantIds = new Set(round.advancers);
+  const m = round.name.match(/(\d+)\s*$/);
+  document.getElementById('roundName').value = m
+    ? round.name.replace(/\d+\s*$/, String(Number(m[1]) + 1))
+    : round.name + ' - שלב הבא';
+  renderParticipantPicker(lastState);
+  document.getElementById('roundName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+
+function renderManualVoteButtons(state, round) {
+  const wrap = document.getElementById('manualVoteButtons');
+  wrap.innerHTML = '';
+  if (!state.currentPerformerId || !round.results[state.currentPerformerId]) return;
+  const votes = round.results[state.currentPerformerId].audienceVotes || [];
+  for (let i = 1; i <= 10; i++) {
+    const btn = document.createElement('button');
+    btn.textContent = i;
+    btn.title = 'הוסף הצבעה ידנית של ' + i + ' נקודות (למשל שיחת טלפון שנספרה בעל פה)';
+    btn.disabled = !round.votingOpen;
+    btn.addEventListener('click', () => {
+      socket.emit('vote:manual', { roundId: round.id, contestantId: state.currentPerformerId, points: i });
+    });
+    wrap.appendChild(btn);
+  }
+  const tally = document.createElement('span');
+  tally.className = 'vote-tally';
+  tally.textContent = `סה"כ הצבעות: ${votes.length}`;
+  wrap.appendChild(tally);
+}
+
+document.getElementById('voteOpenBtn').addEventListener('click', () => {
+  const round = lastState.rounds.find((r) => r.id === lastState.currentRoundId);
+  if (round) socket.emit('vote:open', { roundId: round.id });
+});
+document.getElementById('voteCloseBtn').addEventListener('click', () => {
+  const round = lastState.rounds.find((r) => r.id === lastState.currentRoundId);
+  if (round) socket.emit('vote:close', { roundId: round.id });
+});
+
+document.getElementById('computeRankBtn').addEventListener('click', () => {
+  const round = lastState.rounds.find((r) => r.id === lastState.currentRoundId);
+  if (!round) return;
+  socket.emit('round:scores', { roundId: round.id }, (scores) => {
+    lastRankPreview = scores;
+    const n = Number(document.getElementById('advanceCount').value) || 0;
+    const preview = document.getElementById('rankPreview');
+    preview.innerHTML = scores
+      .map(
+        (s, i) => `<div class="rank-row">
+          <label><input type="checkbox" class="advance-check" data-cid="${s.contestant.id}" ${i < n ? 'checked' : ''}> #${i + 1} ${s.contestant.name}</label>
+          <span>${s.score.combined.toFixed(1)}</span>
+        </div>`
+      )
+      .join('');
+  });
+});
+
+document.getElementById('closeRoundBtn').addEventListener('click', () => {
+  const round = lastState.rounds.find((r) => r.id === lastState.currentRoundId);
+  if (!round) return;
+  const checks = document.querySelectorAll('.advance-check');
+  if (!checks.length) {
+    alert('קודם לחץ על "חשב דירוג" כדי לבחור מי עולה הלאה');
+    return;
+  }
+  const advancerIds = Array.from(checks).filter((c) => c.checked).map((c) => c.dataset.cid);
+  socket.emit('round:close', { roundId: round.id, advancerIds });
+});
+
+// ---- בחירת שיר ----
+document.getElementById('startSongBtn').addEventListener('click', () => {
+  const names = Array.from(document.querySelectorAll('.songNameInput'))
+    .map((i) => i.value.trim())
+    .filter(Boolean);
+  if (names.length < 2) {
+    alert('יש להזין לפחות שני שירים');
+    return;
+  }
+  socket.emit('song:setup', { songNames: names });
+});
+
+document.getElementById('revealSongBtn').addEventListener('click', () => socket.emit('song:reveal'));
+
+function renderSongCounters(state) {
+  const wrap = document.getElementById('songCounters');
+  wrap.innerHTML = '';
+  if (!state.songSelection) return;
+  state.songSelection.songs.forEach((s) => {
+    const div = document.createElement('div');
+    div.className = 'song-counter';
+    div.innerHTML = `<div class="name">${s.name}${state.songSelection.revealed && s.id === state.songSelection.winnerSongId ? ' 🏆' : ''}</div>
+      <div class="controls">
+        <button class="btn small minus">-</button>
+        <input type="number" value="${s.count}" min="0">
+        <button class="btn small plus">+</button>
+      </div>`;
+    const input = div.querySelector('input');
+    const update = (v) => socket.emit('song:setCount', { songId: s.id, count: Math.max(0, v) });
+    div.querySelector('.plus').addEventListener('click', () => update(Number(input.value) + 1));
+    div.querySelector('.minus').addEventListener('click', () => update(Number(input.value) - 1));
+    input.addEventListener('change', () => update(Number(input.value)));
+    wrap.appendChild(div);
+  });
+}
+
+// ---- שליטה כללית ----
+document.querySelectorAll('[data-mode]').forEach((btn) => {
+  btn.addEventListener('click', () => socket.emit('display:setMode', { mode: btn.dataset.mode }));
+});
+
+document.getElementById('stageSlider').addEventListener('input', (e) => {
+  document.getElementById('stageValue').textContent = e.target.value;
+  socket.emit('display:setStage', { level: Number(e.target.value) });
+});
+
+function renderWinnerSelect(state) {
+  const sel = document.getElementById('winnerSelect');
+  const current = sel.value;
+  sel.innerHTML = state.roster.filter((r) => r.id).map((r) => `<option value="${r.id}">${r.name}</option>`).join('');
+  if (current) sel.value = current;
+}
+
+document.getElementById('announceWinnerBtn').addEventListener('click', () => {
+  const sel = document.getElementById('winnerSelect');
+  if (!sel.value) return;
+  if (confirm('להכריז סופית על ' + sel.options[sel.selectedIndex].text + ' כזוכה?')) {
+    socket.emit('winner:announce', { contestantId: sel.value });
+  }
+});
+
+// ---- render ראשי ----
+function render(state) {
+  lastState = state;
+  renderRoster(state);
+  renderPerformerButtons(state);
+  renderParticipantPicker(state);
+  renderRoundPanel(state);
+  renderSongCounters(state);
+  renderWinnerSelect(state);
+  document.getElementById('stageSlider').value = state.display.stageLevel;
+  document.getElementById('stageValue').textContent = state.display.stageLevel;
+  renderMusicMuteBtn(state);
+}
+
+socket.on('state:full', render);
+socket.on('vote:new', () => { if (lastState) renderRoundPanel(lastState); });
+recalcJudgesMax();

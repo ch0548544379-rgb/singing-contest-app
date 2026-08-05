@@ -1,0 +1,23 @@
+{
+  "name": "shira-contest",
+  "version": "1.0.0",
+  "private": true,
+  "description": "מערכת ניהול תחרות שירה - מסך קהל + פאנל ניהול",
+  "main": "server/server.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node server/server.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3",
+    "yemot-router2": "^6.2.1"
+  },
+  "devDependencies": {
+    "localtunnel": "^2.0.2",
+    "puppeteer-core": "^25.5.0",
+    "socket.io-client": "^4.8.3"
+  }
+}
