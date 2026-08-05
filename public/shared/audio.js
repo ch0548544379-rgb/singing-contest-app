@@ -277,12 +277,13 @@
     });
   }
 
-  // מחיאות כפיים סינתטיות - רעש ממוסך ממושך + הרבה "מחיאות" בודדות בפיזור אקראי
+  // מחיאות כפיים סינתטיות - רעש ממוסך ממושך + הרבה "מחיאות" בודדות בפיזור אקראי -
+  // נמשך לאורך זמן משמעותי כדי לחפוף את המוזיקה הדרמטית של הזוכה, לא רק כמה שניות.
   function applause() {
     ensureCtx();
     if (ctx.state === 'suspended') ctx.resume();
     const now = ctx.currentTime;
-    const dur = 3.5;
+    const dur = 14;
     const bufferSize = Math.floor(ctx.sampleRate * dur);
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
@@ -296,7 +297,7 @@
     const g = ctx.createGain();
     g.gain.setValueAtTime(0, now);
     g.gain.linearRampToValueAtTime(0.32, now + 0.35);
-    g.gain.linearRampToValueAtTime(0.24, now + dur - 1);
+    g.gain.linearRampToValueAtTime(0.26, now + dur - 3);
     g.gain.linearRampToValueAtTime(0, now + dur);
     noise.connect(bp);
     bp.connect(g);
@@ -304,7 +305,7 @@
     noise.start(now);
     noise.stop(now + dur + 0.1);
 
-    for (let i = 0; i < 45; i++) {
+    for (let i = 0; i < 180; i++) {
       const t = Math.random() * dur * 1000;
       setTimeout(() => {
         if (!ctx) return;

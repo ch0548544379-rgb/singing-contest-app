@@ -73,9 +73,9 @@ html, body { width: 100%; height: 100%; overflow: hidden; }
 .song-card { padding: clamp(14px,2.6vh,30px) clamp(24px,4vw,50px); font-size: clamp(1.3rem, 2.8vh, 2rem); min-width: 220px; transition: transform 0.4s ease, box-shadow 0.4s ease; }
 .song-card-solo { font-size: clamp(2.4rem, 7vh, 4.5rem); font-weight: bold; color: var(--gold-soft); box-shadow: 0 0 40px rgba(242,193,78,0.7); border-color: var(--gold); animation: winnerPop 1s ease; }
 
-.winner-label { font-size: clamp(1.3rem, 3.2vh, 2.2rem); color: var(--muted); margin-bottom: 0.6vh; }
+.winner-label { font-size: clamp(1.1rem, 2.4vh, 1.7rem); color: var(--muted); margin-bottom: 0.2vh; }
 
-.carpet-perspective { position: relative; width: min(1200px, 94vw); height: clamp(160px, 34vh, 380px); margin: 0.6vh 0; filter: drop-shadow(0 14px 26px rgba(0,0,0,0.55)); }
+.carpet-perspective { position: relative; width: min(1300px, 96vw); height: clamp(220px, 46vh, 480px); margin: 0.2vh 0; filter: drop-shadow(0 14px 26px rgba(0,0,0,0.55)); }
 .carpet-perspective svg { display: block; overflow: visible; }
 
 .winner-name { font-size: clamp(3.4rem, 12vh, 8rem); margin-top: 0.6vh; }
