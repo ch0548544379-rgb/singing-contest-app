@@ -121,7 +121,7 @@ function setMusicScenario(scenario) {
   if (scenario === 'voting') {
     StageAudio.playMusicTrack('/music/tension.mp3', { loop: true, volume: 0.7, fadeMs: 1500 });
   } else {
-    StageAudio.stopMusicTrack(900);
+    StageAudio.stopMusicTrack(2200); // דעיכה איטית ורכה - לא נחתך בבת אחת כשעוברים למתמודד/שלב הבא
   }
 }
 
@@ -329,46 +329,46 @@ function carpetSceneSVG() {
     </defs>
 
     <polygon fill="url(#carpetGrad)">
-      <animate attributeName="points" dur="10s" fill="freeze" calcMode="spline" keySplines="0.16 0.9 0.35 1"
+      <animate attributeName="points" dur="6s" fill="freeze" calcMode="spline" keySplines="0.16 0.9 0.35 1"
         values="470,0 530,0 530,0 470,0; 470,0 530,0 1000,420 0,420"/>
     </polygon>
     <polygon fill="url(#carpetSheen)">
-      <animate attributeName="points" dur="10s" fill="freeze" calcMode="spline" keySplines="0.16 0.9 0.35 1"
+      <animate attributeName="points" dur="6s" fill="freeze" calcMode="spline" keySplines="0.16 0.9 0.35 1"
         values="494,0 506,0 506,0 494,0; 494,0 506,0 620,420 380,420"/>
     </polygon>
     <path fill="none" stroke="#3a0008" stroke-width="2" opacity="0">
-      <animate attributeName="opacity" begin="1s" dur="1s" fill="freeze" values="0;0.5"/>
-      <animate attributeName="d" dur="10s" fill="freeze" calcMode="spline" keySplines="0.16 0.9 0.35 1"
+      <animate attributeName="opacity" begin="0.6s" dur="0.6s" fill="freeze" values="0;0.5"/>
+      <animate attributeName="d" dur="6s" fill="freeze" calcMode="spline" keySplines="0.16 0.9 0.35 1"
         values="M500,0 L500,0 M500,0 L500,0; M500,0 L120,420 M500,0 L880,420"/>
     </path>
 
-    <rect x="490" y="0" width="20" height="12" rx="6" fill="url(#postGold)" filter="url(#goldGlow)">
-      <animate attributeName="y" dur="10s" fill="freeze" calcMode="spline" keySplines="0.16 0.9 0.35 1" values="0;405"/>
-      <animate attributeName="x" dur="10s" fill="freeze" calcMode="spline" keySplines="0.16 0.9 0.35 1" values="490;0"/>
-      <animate attributeName="width" dur="10s" fill="freeze" calcMode="spline" keySplines="0.16 0.9 0.35 1" values="20;1000"/>
+    <rect x="485" y="0" width="30" height="22" rx="11" fill="url(#postGold)" filter="url(#goldGlow)">
+      <animate attributeName="y" dur="6s" fill="freeze" calcMode="spline" keySplines="0.16 0.9 0.35 1" values="0;396"/>
+      <animate attributeName="x" dur="6s" fill="freeze" calcMode="spline" keySplines="0.16 0.9 0.35 1" values="485;0"/>
+      <animate attributeName="width" dur="6s" fill="freeze" calcMode="spline" keySplines="0.16 0.9 0.35 1" values="30;1000"/>
     </rect>
 
-    <path d="M279,148 Q150,300 21,344" fill="none" stroke="url(#ropeGrad)" stroke-width="9" stroke-linecap="round" opacity="0" stroke-dasharray="360" stroke-dashoffset="360" filter="url(#goldGlow)">
-      <animate attributeName="opacity" begin="2.6s" dur="0.4s" fill="freeze" values="0;1"/>
-      <animate attributeName="stroke-dashoffset" begin="2.6s" dur="4.6s" fill="freeze" values="360;0"/>
+    <path d="M279,148 Q150,300 21,344" fill="none" stroke="url(#ropeGrad)" stroke-width="14" stroke-linecap="round" opacity="0" stroke-dasharray="360" stroke-dashoffset="360" filter="url(#goldGlow)">
+      <animate attributeName="opacity" begin="1.56s" dur="0.24s" fill="freeze" values="0;1"/>
+      <animate attributeName="stroke-dashoffset" begin="1.56s" dur="2.76s" fill="freeze" values="360;0"/>
     </path>
-    <path d="M279,148 Q150,300 21,344" fill="none" stroke="#ffb3c2" stroke-width="2.5" stroke-linecap="round" opacity="0" stroke-dasharray="360" stroke-dashoffset="360">
-      <animate attributeName="opacity" begin="2.6s" dur="0.4s" fill="freeze" values="0;0.7"/>
-      <animate attributeName="stroke-dashoffset" begin="2.6s" dur="4.6s" fill="freeze" values="360;0"/>
+    <path d="M279,148 Q150,300 21,344" fill="none" stroke="#ffb3c2" stroke-width="4" stroke-linecap="round" opacity="0" stroke-dasharray="360" stroke-dashoffset="360">
+      <animate attributeName="opacity" begin="1.56s" dur="0.24s" fill="freeze" values="0;0.7"/>
+      <animate attributeName="stroke-dashoffset" begin="1.56s" dur="2.76s" fill="freeze" values="360;0"/>
     </path>
-    <path d="M721,148 Q850,300 979,344" fill="none" stroke="url(#ropeGrad)" stroke-width="9" stroke-linecap="round" opacity="0" stroke-dasharray="360" stroke-dashoffset="360" filter="url(#goldGlow)">
-      <animate attributeName="opacity" begin="2.6s" dur="0.4s" fill="freeze" values="0;1"/>
-      <animate attributeName="stroke-dashoffset" begin="2.6s" dur="4.6s" fill="freeze" values="360;0"/>
+    <path d="M721,148 Q850,300 979,344" fill="none" stroke="url(#ropeGrad)" stroke-width="14" stroke-linecap="round" opacity="0" stroke-dasharray="360" stroke-dashoffset="360" filter="url(#goldGlow)">
+      <animate attributeName="opacity" begin="1.56s" dur="0.24s" fill="freeze" values="0;1"/>
+      <animate attributeName="stroke-dashoffset" begin="1.56s" dur="2.76s" fill="freeze" values="360;0"/>
     </path>
-    <path d="M721,148 Q850,300 979,344" fill="none" stroke="#ffb3c2" stroke-width="2.5" stroke-linecap="round" opacity="0" stroke-dasharray="360" stroke-dashoffset="360">
-      <animate attributeName="opacity" begin="2.6s" dur="0.4s" fill="freeze" values="0;0.7"/>
-      <animate attributeName="stroke-dashoffset" begin="2.6s" dur="4.6s" fill="freeze" values="360;0"/>
+    <path d="M721,148 Q850,300 979,344" fill="none" stroke="#ffb3c2" stroke-width="4" stroke-linecap="round" opacity="0" stroke-dasharray="360" stroke-dashoffset="360">
+      <animate attributeName="opacity" begin="1.56s" dur="0.24s" fill="freeze" values="0;0.7"/>
+      <animate attributeName="stroke-dashoffset" begin="1.56s" dur="2.76s" fill="freeze" values="360;0"/>
     </path>
 
     ${['279,148,1', '721,148,-1'].map((s) => {
       const [cx, cy] = s.split(',');
       return `<g transform="translate(${cx},${cy})" opacity="0" filter="url(#goldGlow)">
-        <animate attributeName="opacity" begin="2.3s" dur="0.5s" fill="freeze" values="0;1"/>
+        <animate attributeName="opacity" begin="1.38s" dur="0.3s" fill="freeze" values="0;1"/>
         <ellipse cx="0" cy="34" rx="13" ry="4.5" fill="#000" opacity="0.35"/>
         <rect x="-5" y="-16" width="10" height="50" rx="4" fill="url(#postGold)" stroke="#4a3208" stroke-width="1"/>
         <circle cx="0" cy="-24" r="11" fill="url(#postGold)" stroke="#4a3208" stroke-width="1.5"/>
@@ -378,7 +378,7 @@ function carpetSceneSVG() {
     ${['21,344,1', '979,344,-1'].map((s) => {
       const [cx, cy] = s.split(',');
       return `<g transform="translate(${cx},${cy})" opacity="0" filter="url(#goldGlow)">
-        <animate attributeName="opacity" begin="6.8s" dur="0.5s" fill="freeze" values="0;1"/>
+        <animate attributeName="opacity" begin="4.08s" dur="0.3s" fill="freeze" values="0;1"/>
         <ellipse cx="0" cy="52" rx="20" ry="7" fill="#000" opacity="0.35"/>
         <rect x="-8" y="-24" width="16" height="76" rx="6" fill="url(#postGold)" stroke="#4a3208" stroke-width="1.4"/>
         <circle cx="0" cy="-35" r="17" fill="url(#postGold)" stroke="#4a3208" stroke-width="2"/>
@@ -401,7 +401,7 @@ function playWinnerSequence(name) {
     void nameEl.offsetWidth;
     nameEl.classList.add('landing');
     StageEffects.burst(null, null, 30);
-  }, 10000);
+  }, 6000);
 }
 
 socket.on('state:full', render);

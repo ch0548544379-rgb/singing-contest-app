@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>פאנל ניהול - תחרות השירה</title>
-<link rel="stylesheet" href="/shared/theme.css?v=6">
-<link rel="stylesheet" href="control.css?v=6">
+<link rel="stylesheet" href="/shared/theme.css?v=7">
+<link rel="stylesheet" href="control.css?v=7">
 </head>
 <body>
 <div class="wrap">
@@ -52,26 +52,29 @@
 
   <section class="panel section">
     <h2>🏆 ניהול סבב</h2>
-    <div class="round-create">
-      <input id="roundName" placeholder="שם השלב, לדוגמה: סבב אחד" value="סבב אחד">
-      <label class="stage-label">שלב תחרות (קובע כמה דרמטי המסך והמוזיקה):
-      <select id="roundStage">
-        <option value="1">שלב 1 - מוקדמות (רגוע)</option>
-        <option value="2">שלב 2 - חצי גמר (יותר דרמטי)</option>
-        <option value="3">שלב 3 - גמר (הכי דרמטי)</option>
-      </select>
-      </label>
-      <label>שופטים:
-        <select id="judgesCount">
-          <option value="2">2</option>
-          <option value="3" selected>3</option>
+    <details id="manualRoundCreate">
+      <summary>יצירת סבב ראשון / סבב ידני מיוחד</summary>
+      <div class="round-create">
+        <input id="roundName" placeholder="שם השלב, לדוגמה: סבב אחד" value="סבב אחד">
+        <label class="stage-label">שלב תחרות (קובע כמה דרמטי המסך והמוזיקה):
+        <select id="roundStage">
+          <option value="1">שלב 1 - מוקדמות (רגוע)</option>
+          <option value="2">שלב 2 - חצי גמר (יותר דרמטי)</option>
+          <option value="3">שלב 3 - גמר (הכי דרמטי)</option>
         </select>
-      </label>
-      <label>מקסימום לשופט: <input id="judgesPerMax" type="number" value="10" min="1" style="width:70px"></label>
-      <label>סה"כ מקס' שופטים: <input id="judgesMax" type="number" value="30" min="1" style="width:70px"></label>
-      <button id="createRoundBtn" class="btn primary">צור סבב חדש</button>
-    </div>
-    <div class="row wrap-row" id="participantPicker"></div>
+        </label>
+        <label>שופטים:
+          <select id="judgesCount">
+            <option value="2">2</option>
+            <option value="3" selected>3</option>
+          </select>
+        </label>
+        <label>מקסימום לשופט: <input id="judgesPerMax" type="number" value="10" min="1" style="width:70px"></label>
+        <label>סה"כ מקס' שופטים: <input id="judgesMax" type="number" value="30" min="1" style="width:70px"></label>
+        <button id="createRoundBtn" class="btn primary">צור סבב חדש</button>
+      </div>
+      <div class="row wrap-row" id="participantPicker"></div>
+    </details>
 
     <div id="roundPanel" class="round-panel hidden">
       <h3 id="roundTitle"></h3>
@@ -138,7 +141,7 @@
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
-<script src="/shared/audio.js?v=6"></script>
-<script src="control.js?v=6"></script>
+<script src="/shared/audio.js?v=7"></script>
+<script src="control.js?v=7"></script>
 </body>
 </html>

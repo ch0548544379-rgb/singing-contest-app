@@ -35,7 +35,8 @@ h1 { font-size: 1.6rem; margin: 0; }
 .saved-note { color: #6be36b; font-weight: bold; }
 .stage-label { display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; color: var(--muted); }
 
-.round-create { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+#manualRoundCreate summary { cursor: pointer; color: var(--gold-soft); font-weight: bold; margin-bottom: 10px; }
+.round-create { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; margin-top: 10px; }
 .round-create input, .round-create select { background: rgba(0,0,0,0.35); border: 1px solid var(--muted); color: var(--text); padding: 8px 10px; border-radius: 8px; }
 
 .participant-pick { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--muted); background: transparent; color: var(--text); cursor: pointer; }

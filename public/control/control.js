@@ -373,12 +373,18 @@ document.getElementById('announceWinnerBtn').addEventListener('click', () => {
 });
 
 // ---- render ראשי ----
+let manualRoundCreateTouched = false;
+document.getElementById('manualRoundCreate').addEventListener('toggle', (e) => { manualRoundCreateTouched = true; });
 function render(state) {
   lastState = state;
   renderRoster(state);
   renderPerformerButtons(state);
   renderParticipantPicker(state);
   renderRoundPanel(state);
+  // הסבב הראשון נוצר ידנית, אבל ברגע שיש סבב פעיל - מסתירים את הקטע הזה כדי לא לבלבל עם כפתור "עבור לסבב הבא"
+  if (!manualRoundCreateTouched) {
+    document.getElementById('manualRoundCreate').open = !state.currentRoundId;
+  }
   renderSongCounters(state);
   renderWinnerSelect(state);
   document.getElementById('stageSlider').value = state.display.stageLevel;
