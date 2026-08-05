@@ -1,2 +1,0 @@
-מסך קהל:  http://localhost:3000/display/
-פאנל ניהול: http://localhost:3000/control/
