@@ -127,7 +127,14 @@ function render(state) {
     document.getElementById('votingName').textContent = c ? c.name : '-';
     document.getElementById('stageBadgeV').textContent = 'שלב ' + stage;
     renderJudgesLive('judgesLiveVoting', round, state.currentPerformerId);
-    renderHistogram(round, state.currentPerformerId);
+
+    // בסבב הגמר (שלב 3) לא מציגים לקהל את תוצאות ההצבעה בזמן אמת, כדי לשמור על אלמנט ההפתעה -
+    // המוזיקה עדיין מתגברת לפי הניקוד בפועל, רק לא מוצגים המספרים.
+    const isFinalStage = round.stageLevel === 3;
+    document.getElementById('histogram').classList.toggle('hidden', isFinalStage);
+    document.getElementById('voteStatsBox').classList.toggle('hidden', isFinalStage);
+    document.getElementById('pointsGaugeWrap').classList.toggle('hidden', isFinalStage);
+    if (!isFinalStage) renderHistogram(round, state.currentPerformerId);
 
     const r = round.results[state.currentPerformerId] || { audienceVotes: [] };
     const votes = r.audienceVotes || [];
@@ -138,6 +145,14 @@ function render(state) {
     document.getElementById('audiencePoints').textContent = norm.toFixed(1);
     document.getElementById('audiencePointsMax').textContent = round.judgesMax;
     StageAudio.setVoteHeat(pct);
+
+    const phoneEl = document.getElementById('votePhoneDisplay');
+    if (state.votePhoneNumber) {
+      phoneEl.textContent = '📞 ' + state.votePhoneNumber;
+      phoneEl.classList.remove('hidden');
+    } else {
+      phoneEl.classList.add('hidden');
+    }
   }
 
   if (state.display.mode === 'results' && round) {

@@ -18,6 +18,7 @@ function createInitialState() {
     rounds: [],
     songSelection: null, // { id, songs:[{id,name,count}], active, revealed, winnerSongId }
     finalWinnerId: null,
+    votePhoneNumber: '',
     display: { mode: 'idle', stageLevel: 1, musicMuted: false }, // idle | performer | voting | results | songSelect | winner
   };
 }
@@ -197,6 +198,27 @@ function setMusicMuted(muted) {
   return state;
 }
 
+function setVotePhoneNumber(number) {
+  state.votePhoneNumber = (number || '').toString();
+  return state;
+}
+
+// מאפס את תוצאות הסבב (ניקוד שופטים + הצבעות קהל) בלי ליצור סבב חדש -
+// לשימוש כשהיתה תקלה וצריך שהמשתתפים ישירו את הסבב מחדש.
+function resetRoundResults(roundId) {
+  const round = getRoundById(roundId);
+  if (!round) return state;
+  round.participantIds.forEach((cid) => {
+    round.results[cid] = { judgesTotal: null, audienceVotes: [] };
+  });
+  round.votingOpen = false;
+  round.closed = false;
+  round.advancers = [];
+  state.currentPerformerId = null;
+  state.display.mode = 'idle';
+  return state;
+}
+
 function setFinalWinner(contestantId) {
   state.finalWinnerId = contestantId || null;
   return state;
@@ -205,6 +227,8 @@ function setFinalWinner(contestantId) {
 module.exports = {
   setStageLevel,
   setMusicMuted,
+  setVotePhoneNumber,
+  resetRoundResults,
   setFinalWinner,
   ROSTER_SIZE,
   getState,

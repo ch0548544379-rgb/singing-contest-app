@@ -19,6 +19,22 @@ document.getElementById('soundStartBtn').addEventListener('click', () => {
   StageAudio.start();
 });
 
+// שומר את השרת "ער" (רלוונטי בעיקר לאירוח חינמי כמו Render שנרדם אחרי חוסר פעילות ממושך)
+setInterval(() => { fetch('/').catch(() => {}); }, 10 * 60 * 1000);
+
+const votePhoneInput = document.getElementById('votePhoneInput');
+votePhoneInput.addEventListener('change', () => {
+  socket.emit('config:setVotePhoneNumber', { number: votePhoneInput.value.trim() });
+});
+
+document.getElementById('resetRoundBtn').addEventListener('click', () => {
+  const round = lastState.rounds.find((r) => r.id === lastState.currentRoundId);
+  if (!round) return;
+  if (confirm(`לאפס את כל התוצאות של "${round.name}" ולחזור על הסבב מחדש (לדוגמה בגלל תקלה)? הניקוד וההצבעות שהוזנו יימחקו, אבל רשימת המשתתפים תישאר.`)) {
+    socket.emit('round:resetResults', { roundId: round.id });
+  }
+});
+
 document.getElementById('musicMuteBtn').addEventListener('click', () => {
   if (!lastState) return;
   socket.emit('display:setMusicMuted', { muted: !lastState.display.musicMuted });
@@ -64,7 +80,7 @@ function renderPerformerButtons(state) {
     btn.addEventListener('click', () => socket.emit('performer:set', { contestantId: r.id }));
     wrap.appendChild(btn);
   });
-  const current = state.roster.find((r) => r.id === state.currentPerformerId);
+  const current = state.currentPerformerId && state.roster.find((r) => r.id === state.currentPerformerId);
   document.getElementById('currentPerformerLabel').textContent = current ? current.name : 'אין';
   renderJudgesBox(state);
 }
@@ -97,6 +113,7 @@ document.getElementById('saveJudgesScoreBtn').addEventListener('click', () => {
   const val = document.getElementById('judgesScoreInput').value;
   if (val === '') return;
   socket.emit('round:setJudges', { roundId: round.id, contestantId: lastState.currentPerformerId, judgesTotal: val });
+  fetch('/').catch(() => {}); // מוודא שהשרת ער לקראת ההצבעה הטלפונית שתיפתח בהמשך
   const note = document.getElementById('judgesSavedNote');
   note.textContent = '✓ נשמר';
   setTimeout(() => (note.textContent = ''), 2000);
@@ -345,6 +362,9 @@ function render(state) {
   document.getElementById('stageSlider').value = state.display.stageLevel;
   document.getElementById('stageValue').textContent = state.display.stageLevel;
   renderMusicMuteBtn(state);
+  if (document.activeElement !== votePhoneInput) {
+    votePhoneInput.value = state.votePhoneNumber || '';
+  }
 }
 
 socket.on('state:full', render);

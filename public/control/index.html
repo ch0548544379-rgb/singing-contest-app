@@ -23,6 +23,10 @@
     <h2>📞 חיבור קו טלפון (ימות המשיח)</h2>
     <p class="hint">כשיהיה לך קו מ"ימות המשיח", הדביקו את הכתובת הבאה בשדה <b>api_link</b> בהגדרות השלוחה מסוג <b>API</b>. השלוחה תקריא למתקשר את שם המבצע הפעיל, תבקש ממנו להקיש ציון בין 1 ל-10, ותשמור את ההצבעה (עם הגנה מהצבעה כפולה של אותו מספר לאותו זמר). גם בלי חיבור טלפון אמיתי - ההצבעה הידנית למטה בכל סבב עובדת באותה מדויקות בדיוק.</p>
     <div class="url-row"><span>כתובת ה-api_link:</span><code id="urlVote">-</code><button class="btn tiny" data-copy="urlVote">העתק</button></div>
+    <div class="url-row">
+      <span>מספר טלפון להצבעה (יוצג לקהל על המסך):</span>
+      <input id="votePhoneInput" placeholder="לדוגמה: 0737110105" style="width:170px; direction:ltr;">
+    </div>
   </section>
 
   <section class="panel section">
@@ -80,6 +84,7 @@
         <button id="voteOpenBtn" class="btn primary">פתח הצבעת קהל למבצע הנוכחי</button>
         <button id="voteCloseBtn" class="btn ghost">סגור הצבעה</button>
         <span id="votingStatus" class="status">סגור</span>
+        <button id="resetRoundBtn" class="btn danger">🔄 אפס תוצאות סבב (לחזרה על הסבב)</button>
       </div>
       <div class="manual-vote-buttons" id="manualVoteButtons"></div>
 

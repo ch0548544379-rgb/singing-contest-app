@@ -103,6 +103,16 @@ io.on('connection', (socket) => {
     broadcastState();
   });
 
+  socket.on('config:setVotePhoneNumber', ({ number }) => {
+    S.setVotePhoneNumber(number);
+    broadcastState();
+  });
+
+  socket.on('round:resetResults', ({ roundId }) => {
+    S.resetRoundResults(roundId);
+    broadcastState();
+  });
+
   // הכרזת הזוכה הסופי - שומר בסטייט + מפעיל אפקט/סאונד חד-פעמי בכל המסכים
   socket.on('winner:announce', ({ contestantId }) => {
     S.setFinalWinner(contestantId);
