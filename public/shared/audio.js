@@ -135,6 +135,27 @@
 
   let muted = false;
 
+  // גיבוי אוטומטי: אם קובץ המוזיקה נחסם/נכשל בטעינה (למשל פילטר רשת כמו נטפרי) - עוברים
+  // מיד למוזיקה מיוצרת בקוד (Web Audio) במקום שקט. ברגע שהקובץ האמיתי כן מצליח לנגן, הגיבוי נכבה.
+  let proceduralFallbackActive = false;
+  function startProceduralFallback() {
+    ensureCtx();
+    if (ctx.state === 'suspended') ctx.resume();
+    if (proceduralFallbackActive) return;
+    proceduralFallbackActive = true;
+    rebuildPad();
+    scheduleArp();
+    schedulePerc();
+  }
+  function stopProceduralFallback() {
+    if (!proceduralFallbackActive) return;
+    proceduralFallbackActive = false;
+    padOscBanks.forEach((o) => { try { o.stop(); } catch (e) {} });
+    padOscBanks = [];
+    clearInterval(arpTimer);
+    clearInterval(percTimer);
+  }
+
   // --- מוזיקת רקע אמיתית (קבצי MP3) - מתנגנת רק ברגעים ספציפיים: הצבעה פתוחה, סגירת סבב, זוכה.
   // אין יותר "זמזום" רציף ברקע בזמן שמישהו שר או שמזינים ניקוד שופטים - שקט מוחלט שם, בכוונה.
   let currentTrack = null;
@@ -168,7 +189,15 @@
     const audio = new Audio(url);
     audio.loop = !!opts.loop;
     audio.volume = 0;
-    audio.play().catch((err) => console.warn('StageAudio: playback blocked for', url, err && err.message));
+    audio.addEventListener('error', () => {
+      console.warn('StageAudio: file blocked/failed to load, switching to generated fallback music:', url);
+      startProceduralFallback();
+    });
+    audio.addEventListener('playing', () => stopProceduralFallback());
+    audio.play().catch((err) => {
+      console.warn('StageAudio: playback blocked for', url, err && err.message);
+      startProceduralFallback();
+    });
     currentTrack = audio;
     currentTrackVolume = targetVolume;
     fadeElementVolume(audio, 0, muted ? 0 : targetVolume, fadeMs);
@@ -176,6 +205,7 @@
   }
 
   function stopMusicTrack(fadeMs) {
+    stopProceduralFallback();
     if (!currentTrack) return;
     const audio = currentTrack;
     currentTrack = null;
@@ -202,11 +232,17 @@
   }
 
   function setStage(level) {
-    stage = Math.max(1, Math.min(3, Number(level) || 1));
+    const next = Math.max(1, Math.min(3, Number(level) || 1));
+    if (next === stage) return;
+    stage = next;
+    if (proceduralFallbackActive) { rebuildPad(); scheduleArp(); schedulePerc(); }
   }
 
   function setVoting(active) {
-    voting = !!active;
+    const next = !!active;
+    if (voting === next) return;
+    voting = next;
+    if (proceduralFallbackActive) { scheduleArp(); schedulePerc(); }
   }
 
   function setVoteHeat(pct) {
