@@ -1,4 +1,6 @@
-const socket = io();
+// polling בלבד (בלי שדרוג ל-websocket) - חלק מרשתות/פילטרים (כמו נטפרי) חוסמים ספציפית את פרוטוקול ה-WebSocket
+// גם אחרי שהם מאשרים את הדף עצמו, בעוד polling רגיל (בקשות HTTP חוזרות) עובר בלי בעיה.
+const socket = io({ transports: ['polling'] });
 
 const screens = {
   idle: document.getElementById('screen-idle'),
