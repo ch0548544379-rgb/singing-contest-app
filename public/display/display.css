@@ -75,13 +75,8 @@ html, body { width: 100%; height: 100%; overflow: hidden; }
 
 .winner-label { font-size: clamp(1.3rem, 3.2vh, 2.2rem); color: var(--muted); margin-bottom: 0.6vh; }
 
-.carpet-track { position: relative; width: min(1100px, 92vw); height: clamp(50px, 12vh, 120px); overflow: hidden; margin: 1vh 0; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-.carpet-strip { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, #8a0000 0 42px, #b3001b 42px 84px); background-size: 240px 100%; animation: carpetRun 1.1s linear infinite; }
-.carpet-track::before, .carpet-track::after { content: ''; position: absolute; top: 0; bottom: 0; width: 8px; background: linear-gradient(180deg, var(--gold), #9a6a12, var(--gold)); z-index: 2; }
-.carpet-track::before { left: 0; }
-.carpet-track::after { right: 0; }
-.carpet-track.stopped .carpet-strip { animation-play-state: paused; }
-@keyframes carpetRun { from { background-position: 0 0; } to { background-position: -240px 0; } }
+.carpet-perspective { position: relative; width: min(1200px, 94vw); height: clamp(160px, 34vh, 380px); margin: 0.6vh 0; filter: drop-shadow(0 14px 26px rgba(0,0,0,0.55)); }
+.carpet-perspective svg { display: block; overflow: visible; }
 
 .winner-name { font-size: clamp(3.4rem, 12vh, 8rem); margin-top: 0.6vh; }
 .winner-name.gold-cast {

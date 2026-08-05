@@ -9,6 +9,7 @@
   let started = false;
   let stage = 1;
   let voting = false;
+  let voteHeat = 0;
   let arpStep = 0;
 
   // אקורדים (יחסית לטוניקה, בסמיטונים) - מינורי עדין -> מתוח -> דרמטי
@@ -133,56 +134,83 @@
   }
 
   let muted = false;
+
+  // --- מוזיקת רקע אמיתית (קבצי MP3) - מתנגנת רק ברגעים ספציפיים: הצבעה פתוחה, סגירת סבב, זוכה.
+  // אין יותר "זמזום" רציף ברקע בזמן שמישהו שר או שמזינים ניקוד שופטים - שקט מוחלט שם, בכוונה.
+  let currentTrack = null;
+  let currentTrackVolume = 0.8;
+
+  // מזהה-דור לכל אלמנט אודיו - מבטל fade ישן אם מתחיל fade חדש על אותו אלמנט (מונע שני fade-ים
+  // שרצים בו-זמנית ו"נלחמים" זה בזה על audio.volume, מה שיכול לגרום לערך חורג מהטווח [0,1] ולזרוק שגיאה).
+  let fadeSeq = 0;
+  function fadeElementVolume(audio, from, to, ms, onDone) {
+    const myFade = ++fadeSeq;
+    audio._fadeId = myFade;
+    const clampedFrom = Math.max(0, Math.min(1, from));
+    const clampedTo = Math.max(0, Math.min(1, to));
+    const startTime = performance.now();
+    audio.volume = clampedFrom;
+    function step(now) {
+      if (audio._fadeId !== myFade) return;
+      const t = Math.min(1, (now - startTime) / ms);
+      audio.volume = Math.max(0, Math.min(1, clampedFrom + (clampedTo - clampedFrom) * t));
+      if (t < 1) requestAnimationFrame(step);
+      else { audio.volume = clampedTo; if (onDone) onDone(); }
+    }
+    requestAnimationFrame(step);
+  }
+
+  function playMusicTrack(url, opts) {
+    opts = opts || {};
+    const targetVolume = opts.volume != null ? opts.volume : 0.8;
+    const fadeMs = opts.fadeMs != null ? opts.fadeMs : 1200;
+    stopMusicTrack(400);
+    const audio = new Audio(url);
+    audio.loop = !!opts.loop;
+    audio.volume = 0;
+    audio.play().catch(() => {});
+    currentTrack = audio;
+    currentTrackVolume = targetVolume;
+    fadeElementVolume(audio, 0, muted ? 0 : targetVolume, fadeMs);
+    return audio;
+  }
+
+  function stopMusicTrack(fadeMs) {
+    if (!currentTrack) return;
+    const audio = currentTrack;
+    currentTrack = null;
+    fadeElementVolume(audio, audio.volume, 0, fadeMs == null ? 800 : fadeMs, () => { try { audio.pause(); } catch (e) {} });
+  }
+
   function setMuted(next) {
-    muted = !!next;
+    const nextMuted = !!next;
+    if (nextMuted === muted) return; // נקרא בכל render() - לא להתחיל fade חדש כשכלום לא השתנה
+    muted = nextMuted;
     if (ctx) master.gain.setTargetAtTime(muted ? 0 : 0.55, ctx.currentTime, 0.25);
+    if (currentTrack) fadeElementVolume(currentTrack, currentTrack.volume, muted ? 0 : currentTrackVolume, 400);
   }
 
   function start() {
     ensureCtx();
     if (ctx.state === 'suspended') ctx.resume();
-    if (muted) master.gain.value = 0;
-    if (!started) {
-      rebuildPad();
-      scheduleArp();
-      schedulePerc();
-      started = true;
-    }
+    started = true;
   }
 
   function stop() {
-    if (!started) return;
-    padOscBanks.forEach((o) => { try { o.stop(); } catch (e) {} });
-    padOscBanks = [];
-    clearInterval(arpTimer);
-    clearInterval(percTimer);
     started = false;
+    stopMusicTrack(300);
   }
 
   function setStage(level) {
-    const next = Math.max(1, Math.min(3, Number(level) || 1));
-    if (next === stage) return;
-    stage = next;
-    if (started) { rebuildPad(); scheduleArp(); schedulePerc(); }
+    stage = Math.max(1, Math.min(3, Number(level) || 1));
   }
 
   function setVoting(active) {
-    if (voting === !!active) return;
     voting = !!active;
-    voteHeat = 0;
-    if (started) { scheduleArp(); schedulePerc(); }
   }
 
-  // "חום" ההצבעה (0-1) - כמה מהניקוד המקסימלי הקהל כבר צבר. ככל שעולה, המוזיקה מתהדקת ומתגברת.
-  let voteHeat = 0;
   function setVoteHeat(pct) {
-    const next = Math.max(0, Math.min(1, Number(pct) || 0));
-    if (Math.abs(next - voteHeat) < 0.01) return;
-    voteHeat = next;
-    if (started && voting) {
-      filter.frequency.setTargetAtTime(900 + stage * 200 + voteHeat * 900, ctx.currentTime, 0.8);
-      percGain.gain.setTargetAtTime(0.35 + voteHeat * 0.25, ctx.currentTime, 0.8);
-    }
+    voteHeat = Math.max(0, Math.min(1, Number(pct) || 0));
   }
 
   // הלמת תוף בודדת וחדה - לרגע ששומרים ניקוד שופטים
@@ -299,5 +327,5 @@
     }
   }
 
-  window.StageAudio = { start, stop, setStage, setVoting, setVoteHeat, setMuted, judgesSting, voteOpenSting, applause, winnerStinger, isStarted: () => started };
+  window.StageAudio = { start, stop, setStage, setVoting, setVoteHeat, setMuted, judgesSting, voteOpenSting, applause, winnerStinger, playMusicTrack, stopMusicTrack, isStarted: () => started };
 })();

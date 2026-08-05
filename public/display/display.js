@@ -113,14 +113,27 @@ function renderHistogram(round, contestantId) {
   document.getElementById('voteAvg').textContent = avg.toFixed(1);
 }
 
+// מוזיקה אמיתית (קובץ) רק ברגעים ספציפיים - שקט מוחלט על הבמה ובזמן ניקוד שופטים, בכוונה.
+let currentMusicScenario = null;
+function setMusicScenario(scenario) {
+  if (scenario === currentMusicScenario) return;
+  currentMusicScenario = scenario;
+  if (scenario === 'voting') {
+    StageAudio.playMusicTrack('/music/tension.mp3', { loop: true, volume: 0.7, fadeMs: 1500 });
+  } else {
+    StageAudio.stopMusicTrack(900);
+  }
+}
+
 function render(state) {
   lastState = state;
   const stage = state.display.stageLevel || 1;
   document.getElementById('stageBg').className = 'stage-bg stage-' + stage;
-  votingIntensity = state.display.mode === 'voting' ? 1.6 + stage * 0.5 : 0.6 + stage * 0.25;
+  votingIntensity = state.display.mode === 'voting' ? 2.6 + stage * 0.8 : 1.3 + stage * 0.45;
   StageAudio.setMuted(!!state.display.musicMuted);
   StageAudio.setStage(stage);
   StageAudio.setVoting(state.display.mode === 'voting');
+  setMusicScenario(state.display.mode === 'voting' ? 'voting' : null);
 
   showScreen(state.display.mode);
 
@@ -282,16 +295,78 @@ function renderResultsReveal(state, round) {
   showStep(0);
 }
 
-// רצף הכרזת הזוכה: השטיח האדום רץ, נעצר, והשם נוחת עליו בזהב
+// שטיח אדום בפרספקטיבה (גליל שנפתח לכיוון האופק) + עמודי זהב עם חבל אדום משני הצדדים - סצנת SVG אחת שרצה בעצמה
+function carpetSceneSVG() {
+  return `
+  <svg viewBox="0 0 1000 400" preserveAspectRatio="xMidYMax meet" width="100%" height="100%">
+    <defs>
+      <linearGradient id="carpetGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#7a0000"/>
+        <stop offset="45%" stop-color="#c3001f"/>
+        <stop offset="100%" stop-color="#8a0000"/>
+      </linearGradient>
+      <linearGradient id="postGold" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#fff2c9"/>
+        <stop offset="45%" stop-color="#d9ac3f"/>
+        <stop offset="100%" stop-color="#8a5f10"/>
+      </linearGradient>
+    </defs>
+
+    <polygon fill="url(#carpetGrad)" opacity="0.97">
+      <animate attributeName="points" dur="10s" fill="freeze" calcMode="spline" keySplines="0.16 0.9 0.35 1"
+        values="460,0 540,0 540,0 460,0; 460,0 540,0 1000,400 0,400"/>
+    </polygon>
+    <rect x="480" y="0" width="40" height="9" rx="4.5" fill="url(#postGold)">
+      <animate attributeName="y" dur="10s" fill="freeze" calcMode="spline" keySplines="0.16 0.9 0.35 1" values="0;391"/>
+      <animate attributeName="x" dur="10s" fill="freeze" calcMode="spline" keySplines="0.16 0.9 0.35 1" values="480;0"/>
+      <animate attributeName="width" dur="10s" fill="freeze" calcMode="spline" keySplines="0.16 0.9 0.35 1" values="40;1000"/>
+    </rect>
+
+    <path d="M269,132 Q144,290 19,332" fill="none" stroke="#8a0010" stroke-width="6" stroke-linecap="round" opacity="0" stroke-dasharray="340" stroke-dashoffset="340">
+      <animate attributeName="opacity" begin="2.6s" dur="0.4s" fill="freeze" values="0;1"/>
+      <animate attributeName="stroke-dashoffset" begin="2.6s" dur="4.6s" fill="freeze" values="340;0"/>
+    </path>
+    <path d="M731,132 Q856,290 981,332" fill="none" stroke="#8a0010" stroke-width="6" stroke-linecap="round" opacity="0" stroke-dasharray="340" stroke-dashoffset="340">
+      <animate attributeName="opacity" begin="2.6s" dur="0.4s" fill="freeze" values="0;1"/>
+      <animate attributeName="stroke-dashoffset" begin="2.6s" dur="4.6s" fill="freeze" values="340;0"/>
+    </path>
+
+    <g id="postFarL" transform="translate(269,140)" opacity="0">
+      <animate attributeName="opacity" begin="2.3s" dur="0.5s" fill="freeze" values="0;1"/>
+      <ellipse cx="0" cy="30" rx="11" ry="4" fill="#000" opacity="0.3"/>
+      <rect x="-4" y="-14" width="8" height="44" rx="3" fill="url(#postGold)"/>
+      <circle cx="0" cy="-20" r="9" fill="url(#postGold)" stroke="#5a3d08" stroke-width="1.2"/>
+    </g>
+    <g id="postFarR" transform="translate(731,140)" opacity="0">
+      <animate attributeName="opacity" begin="2.3s" dur="0.5s" fill="freeze" values="0;1"/>
+      <ellipse cx="0" cy="30" rx="11" ry="4" fill="#000" opacity="0.3"/>
+      <rect x="-4" y="-14" width="8" height="44" rx="3" fill="url(#postGold)"/>
+      <circle cx="0" cy="-20" r="9" fill="url(#postGold)" stroke="#5a3d08" stroke-width="1.2"/>
+    </g>
+    <g id="postNearL" transform="translate(19,340)" opacity="0">
+      <animate attributeName="opacity" begin="6.8s" dur="0.5s" fill="freeze" values="0;1"/>
+      <ellipse cx="0" cy="46" rx="17" ry="6" fill="#000" opacity="0.3"/>
+      <rect x="-6" y="-22" width="12" height="68" rx="4" fill="url(#postGold)"/>
+      <circle cx="0" cy="-31" r="14" fill="url(#postGold)" stroke="#5a3d08" stroke-width="1.5"/>
+    </g>
+    <g id="postNearR" transform="translate(981,340)" opacity="0">
+      <animate attributeName="opacity" begin="6.8s" dur="0.5s" fill="freeze" values="0;1"/>
+      <ellipse cx="0" cy="46" rx="17" ry="6" fill="#000" opacity="0.3"/>
+      <rect x="-6" y="-22" width="12" height="68" rx="4" fill="url(#postGold)"/>
+      <circle cx="0" cy="-31" r="14" fill="url(#postGold)" stroke="#5a3d08" stroke-width="1.5"/>
+    </g>
+  </svg>`;
+}
+
+// רצף הכרזת הזוכה: השטיח האדום נפרש בפרספקטיבה לכיוון האופק עם עמודי חבל, נעצר, והשם נוחת עליו בזהב
 function playWinnerSequence(name) {
-  const track = document.getElementById('carpetTrack');
+  const wrap = document.getElementById('carpetPerspective');
   const nameEl = document.getElementById('winnerName');
-  track.classList.remove('stopped');
+  wrap.innerHTML = carpetSceneSVG(); // markup חדש בכל קריאה = אנימציות ה-SVG מתחילות מאפס
   nameEl.classList.add('hidden');
   nameEl.classList.remove('landing');
   nameEl.textContent = name;
   setTimeout(() => {
-    track.classList.add('stopped');
     nameEl.classList.remove('hidden');
     void nameEl.offsetWidth;
     nameEl.classList.add('landing');
@@ -305,8 +380,9 @@ socket.on('vote:new', () => {
   StageEffects.burst(null, null, 20);
 });
 socket.on('effect:winnerStinger', () => {
+  currentMusicScenario = 'winner';
   if (StageAudio.isStarted()) {
-    StageAudio.winnerStinger();
+    StageAudio.playMusicTrack('/music/the-harder-they-fall.mp3', { loop: false, volume: 0.85, fadeMs: 200 });
     StageAudio.applause();
   }
 });
@@ -318,4 +394,10 @@ socket.on('effect:judgesSting', ({ contestantId }) => {
 socket.on('effect:voteOpenSting', () => {
   if (StageAudio.isStarted()) StageAudio.voteOpenSting();
   flashSting();
+});
+socket.on('effect:roundClosed', () => {
+  currentMusicScenario = 'roundClosed';
+  if (StageAudio.isStarted()) {
+    StageAudio.playMusicTrack('/music/action.mp3', { loop: false, volume: 0.85, fadeMs: 250 });
+  }
 });

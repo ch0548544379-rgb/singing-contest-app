@@ -23,14 +23,14 @@
         particles.push({
           x: opts.x != null ? opts.x + (Math.random() - 0.5) * 120 : Math.random() * w,
           y: opts.y != null ? opts.y : h + 40,
-          size: (opts.big ? 30 : 18) + Math.random() * 30,
-          speed: (opts.big ? 1.2 : 0.5) + Math.random() * 1.6,
-          drift: (Math.random() - 0.5) * (opts.big ? 2.2 : 0.9),
+          size: (opts.big ? 34 : 20) + Math.random() * 32,
+          speed: (opts.big ? 3.2 : 2) + Math.random() * 3.4,
+          drift: (Math.random() - 0.5) * (opts.big ? 4.5 : 2.6),
           char: NOTE_CHARS[Math.floor(Math.random() * NOTE_CHARS.length)],
           hue: ['#f2c14e', '#7d5cff', '#ff3d6e'][Math.floor(Math.random() * 3)],
           rot: Math.random() * Math.PI * 2,
-          rotSpeed: (Math.random() - 0.5) * 0.03,
-          alpha: 0.25 + Math.random() * 0.45,
+          rotSpeed: (Math.random() - 0.5) * 0.08,
+          alpha: 0.3 + Math.random() * 0.5,
         });
       }
     }
@@ -38,7 +38,7 @@
     function tick() {
       const intensity = getIntensity ? getIntensity() : 1;
       ctx.clearRect(0, 0, w, h);
-      if (Math.random() < 0.14 * intensity) spawn(1 + Math.floor(intensity * 1.5));
+      if (Math.random() < 0.24 * intensity) spawn(1 + Math.floor(intensity * 1.8));
       particles.forEach((p) => {
         p.y -= p.speed * intensity;
         p.x += p.drift;

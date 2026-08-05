@@ -31,8 +31,8 @@ async function run() {
   control.on('pageerror', (e) => errors.push('CONTROL PAGEERROR: ' + e.message));
   display.on('pageerror', (e) => errors.push('DISPLAY PAGEERROR: ' + e.message));
 
-  await withTimeout(control.goto('http://localhost:3000/control/', { waitUntil: 'networkidle0' }), 15000, 'goto control');
-  await withTimeout(display.goto('http://localhost:3000/display/', { waitUntil: 'networkidle0' }), 15000, 'goto display');
+  await withTimeout(control.goto('http://localhost:3000/control/', { waitUntil: 'domcontentloaded' }), 15000, 'goto control');
+  await withTimeout(display.goto('http://localhost:3000/display/', { waitUntil: 'domcontentloaded' }), 15000, 'goto display');
   await display.evaluate(() => document.getElementById('soundBtn').click());
   await new Promise((r) => setTimeout(r, 300));
 

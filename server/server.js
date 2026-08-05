@@ -14,6 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/display', express.static(path.join(__dirname, '..', 'public', 'display')));
 app.use('/control', express.static(path.join(__dirname, '..', 'public', 'control')));
 app.use('/shared', express.static(path.join(__dirname, '..', 'public', 'shared')));
+app.use('/music', express.static(path.join(__dirname, '..', 'public', 'music')));
 
 app.get('/', (req, res) => res.redirect('/control/'));
 
@@ -71,12 +72,14 @@ io.on('connection', (socket) => {
   socket.on('round:close', ({ roundId, advancerIds }) => {
     S.closeRound(roundId, advancerIds);
     broadcastState();
+    io.emit('effect:roundClosed');
   });
 
   // סוגר את הסבב ובוחר אוטומטית את N המדורגים הראשונים - כפתור "סיים סבב" האחד שהמפעיל לוחץ עליו
   socket.on('round:closeAuto', ({ roundId, advanceCount }) => {
     S.closeRoundAuto(roundId, advanceCount);
     broadcastState();
+    io.emit('effect:roundClosed');
   });
 
   socket.on('song:setup', ({ songNames }) => {

@@ -38,8 +38,8 @@ async function run() {
   control.on('console', (m) => { if (m.type() === 'error') errors.push('CONTROL CONSOLE: ' + m.text()); });
   display.on('console', (m) => { if (m.type() === 'error') errors.push('DISPLAY CONSOLE: ' + m.text()); });
 
-  await withTimeout(control.goto('http://localhost:3000/control/', { waitUntil: 'networkidle0' }), 15000, 'goto control');
-  await withTimeout(display.goto('http://localhost:3000/display/', { waitUntil: 'networkidle0' }), 15000, 'goto display');
+  await withTimeout(control.goto('http://localhost:3000/control/', { waitUntil: 'domcontentloaded' }), 15000, 'goto control');
+  await withTimeout(display.goto('http://localhost:3000/display/', { waitUntil: 'domcontentloaded' }), 15000, 'goto display');
   await new Promise((r) => setTimeout(r, 500));
 
   // reset state to start clean

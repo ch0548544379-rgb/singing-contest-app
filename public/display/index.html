@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>תחרות השירה - מסך קהל</title>
-<link rel="stylesheet" href="/shared/theme.css">
-<link rel="stylesheet" href="display.css">
+<link rel="stylesheet" href="/shared/theme.css?v=5">
+<link rel="stylesheet" href="display.css?v=5">
 </head>
 <body>
   <div class="stage-bg" id="stageBg"></div>
@@ -72,14 +72,14 @@
     <!-- מצב: זוכה -->
     <section id="screen-winner" class="screen hidden">
       <p class="winner-label">והזוכה הוא...</p>
-      <div class="carpet-track" id="carpetTrack"><div class="carpet-strip"></div></div>
+      <div class="carpet-perspective" id="carpetPerspective"></div>
       <h1 class="winner-name gold-cast hidden" id="winnerName">-</h1>
     </section>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/shared/effects.js"></script>
-  <script src="/shared/audio.js"></script>
-  <script src="display.js"></script>
+  <script src="/shared/effects.js?v=5"></script>
+  <script src="/shared/audio.js?v=5"></script>
+  <script src="display.js?v=5"></script>
 </body>
 </html>

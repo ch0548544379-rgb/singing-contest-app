@@ -30,11 +30,11 @@ async function run() {
   const control = await browser.newPage();
   const display = await browser.newPage();
   const errors = [];
-  control.on('pageerror', (e) => errors.push('CONTROL PAGEERROR: ' + e.message));
-  display.on('pageerror', (e) => errors.push('DISPLAY PAGEERROR: ' + e.message));
+  control.on('pageerror', (e) => { errors.push('CONTROL PAGEERROR: ' + e.message); console.log('CONTROL PAGEERROR:', e.message); });
+  display.on('pageerror', (e) => { errors.push('DISPLAY PAGEERROR: ' + e.message); console.log('DISPLAY PAGEERROR:', e.message); });
 
-  await control.goto('http://localhost:3000/control/', { waitUntil: 'networkidle0' });
-  await display.goto('http://localhost:3000/display/', { waitUntil: 'networkidle0' });
+  await control.goto('http://localhost:3000/control/', { waitUntil: 'domcontentloaded' });
+  await display.goto('http://localhost:3000/display/', { waitUntil: 'domcontentloaded' });
   await display.evaluate(() => document.getElementById('soundBtn').click());
   await wait(300);
 
@@ -182,14 +182,15 @@ async function run() {
   await clickEl(control, '#announceWinnerBtn');
   await wait(300);
   const winnerStart = await display.evaluate(() => ({
-    carpetRunning: !document.getElementById('carpetTrack').classList.contains('stopped'),
+    carpetSvgPresent: !!document.querySelector('#carpetPerspective svg'),
+    nameHidden: document.getElementById('winnerName').classList.contains('hidden'),
     overflow: document.documentElement.scrollHeight > document.documentElement.clientHeight + 2,
   }));
-  console.log('[winner] carpet running right after announce:', JSON.stringify(winnerStart));
+  console.log('[winner] carpet SVG present + name still hidden right after announce:', JSON.stringify(winnerStart));
   await wait(10500); // carpet now rolls for a full 10s before the name lands
   const winnerFinal = await display.evaluate(() => ({
     nameText: document.getElementById('winnerName').textContent,
-    carpetStopped: document.getElementById('carpetTrack').classList.contains('stopped'),
+    nameLanded: document.getElementById('winnerName').classList.contains('landing') && !document.getElementById('winnerName').classList.contains('hidden'),
     overflow: document.documentElement.scrollHeight > document.documentElement.clientHeight + 2,
   }));
   console.log('[winner] final state:', JSON.stringify(winnerFinal));
