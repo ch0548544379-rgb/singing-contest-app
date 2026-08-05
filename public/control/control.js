@@ -224,7 +224,7 @@ function renderRoundPanel(state) {
   if (round.closed && round.advancers.length) {
     const nextStage = Math.min(3, round.stageLevel + 1);
     nextBtn.classList.remove('hidden');
-    nextBtn.textContent = `➡ התחל סבב ${ROUND_ORDINALS[nextStage] || nextStage} עם ${round.advancers.length} המדורגים`;
+    nextBtn.textContent = `➡ עבור לסבב ${ROUND_ORDINALS[nextStage] || nextStage} (${round.advancers.length} עולים כבר מוכנים)`;
   } else {
     nextBtn.classList.add('hidden');
   }
