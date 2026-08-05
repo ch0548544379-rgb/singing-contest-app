@@ -82,6 +82,9 @@ StageEffects.initSilhouettes('silhouette-layer', 3);
 document.getElementById('soundBtn').addEventListener('click', () => {
   StageAudio.start();
   document.getElementById('soundGate').classList.add('hidden');
+  // הניסיון הראשון לנגן מוזיקת פתיחה קרה לפני הלחיצה (חסום ע"י מדיניות הדפדפן) - מאלצים ניסיון חוזר עכשיו שיש ג'סטורה אמיתית
+  currentMusicScenario = null;
+  if (lastState) render(lastState);
 });
 
 function showScreen(mode) {
@@ -120,6 +123,8 @@ function setMusicScenario(scenario) {
   currentMusicScenario = scenario;
   if (scenario === 'voting') {
     StageAudio.playMusicTrack('/music/tension.mp3', { loop: true, volume: 0.7, fadeMs: 1500 });
+  } else if (scenario === 'idle') {
+    StageAudio.playMusicTrack('/music/opening.mp3', { loop: true, volume: 0.6, fadeMs: 1500 });
   } else {
     StageAudio.stopMusicTrack(2200); // דעיכה איטית ורכה - לא נחתך בבת אחת כשעוברים למתמודד/שלב הבא
   }
@@ -133,7 +138,7 @@ function render(state) {
   StageAudio.setMuted(!!state.display.musicMuted);
   StageAudio.setStage(stage);
   StageAudio.setVoting(state.display.mode === 'voting');
-  setMusicScenario(state.display.mode === 'voting' ? 'voting' : null);
+  setMusicScenario(state.display.mode === 'voting' ? 'voting' : state.display.mode === 'idle' ? 'idle' : null);
 
   showScreen(state.display.mode);
 
