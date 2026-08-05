@@ -37,12 +37,13 @@ function createYemotRouter(io, broadcastState) {
       return call.id_list_message([{ type: 'text', data: 'הציון שהוקש אינו תקין, נסו שוב', removeInvalidChars: true }]);
     }
 
-    votedPhones.add(voteKey);
     const result = S.castVote(round.id, contestant.id, points);
-    if (result) {
-      io.emit('vote:new', { contestantId: contestant.id, result });
-      broadcastState();
+    if (!result) {
+      return call.id_list_message([{ type: 'text', data: 'מצטערים, ההצבעה נסגרה', removeInvalidChars: true }]);
     }
+    votedPhones.add(voteKey);
+    io.emit('vote:new', { contestantId: contestant.id, result });
+    broadcastState();
 
     return call.id_list_message([{ type: 'text', data: 'תודה על ההצבעה', removeInvalidChars: true }]);
   });

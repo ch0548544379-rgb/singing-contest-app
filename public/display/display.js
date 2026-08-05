@@ -35,16 +35,38 @@ function pickVariation(seed) {
   };
 }
 
-function animateCountUp(el, from, to, duration, onDone) {
+function animateCountUp(el, from, to, duration, onDone, decimals) {
+  const d = decimals == null ? 1 : decimals;
   const startTime = performance.now();
   function step(now) {
     const t = Math.min(1, (now - startTime) / duration);
     const eased = 1 - Math.pow(1 - t, 3);
-    el.textContent = (from + (to - from) * eased).toFixed(1);
+    el.textContent = (from + (to - from) * eased).toFixed(d);
     if (t < 1) requestAnimationFrame(step);
-    else { el.textContent = to.toFixed(1); if (onDone) onDone(); }
+    else { el.textContent = to.toFixed(d); if (onDone) onDone(); }
   }
   requestAnimationFrame(step);
+}
+
+// אנימציית "מספרים עפים" לניקוד השופטים - מופעלת ברגע שהניקוד נשמר (effect:judgesSting)
+function animateJudgesScore(contestantId) {
+  if (!lastState) return;
+  const round = lastState.rounds.find((r) => r.id === lastState.currentRoundId);
+  if (!round) return;
+  const r = round.results[contestantId];
+  if (!r || r.judgesTotal == null) return;
+  const elId = lastState.display.mode === 'voting' ? 'judgesLiveVoting' : 'judgesLivePerformer';
+  const wrap = document.getElementById(elId);
+  const span = wrap.querySelector('span');
+  const v = pickVariation(round.id + ':' + contestantId + ':judges');
+  span.className = `digit-${v.style}`;
+  wrap.classList.remove('hidden');
+  void wrap.offsetWidth;
+  span.classList.add('counting');
+  animateCountUp(span, 0, r.judgesTotal, v.duration, () => {
+    span.classList.remove('counting');
+    StageEffects.burst(null, null, 10);
+  }, 0);
 }
 
 function flashSting() {
@@ -195,17 +217,12 @@ function computeRoundRows(state, round) {
     .sort((a, b) => b.combined - a.combined);
 }
 
-// רשימת התוצאות המלאה (כל המשתתפים) - מוצגת בלי אנימציה אחרי סיום הספוטלייט
+// אחרי הספוטלייט - מציגים רק את שמות העולים הלאה, בלי מספרי דירוג ובלי שאר המשתתפים
 function renderFullResultsList(rows, round) {
   const list = document.getElementById('resultsList');
-  list.innerHTML = rows
-    .map(
-      (row, i) => `<div class="panel result-row reveal-in ${round.advancers.includes(row.c && row.c.id) ? 'advancer' : ''}">
-        <span class="result-rank">#${i + 1}</span>
-        <span class="result-name">${row.c ? row.c.name : ''}</span>
-        <span class="result-score">${row.combined.toFixed(1)}</span>
-      </div>`
-    )
+  const advancerRows = rows.filter((row) => row.c && round.advancers.includes(row.c.id));
+  list.innerHTML = advancerRows
+    .map((row) => `<div class="panel result-row reveal-in advancer"><span class="result-name">${row.c.name}</span></div>`)
     .join('');
 }
 
@@ -292,9 +309,10 @@ socket.on('effect:winnerStinger', () => {
     StageAudio.applause();
   }
 });
-socket.on('effect:judgesSting', () => {
+socket.on('effect:judgesSting', ({ contestantId }) => {
   if (StageAudio.isStarted()) StageAudio.judgesSting();
   flashSting();
+  animateJudgesScore(contestantId);
 });
 socket.on('effect:voteOpenSting', () => {
   if (StageAudio.isStarted()) StageAudio.voteOpenSting();
