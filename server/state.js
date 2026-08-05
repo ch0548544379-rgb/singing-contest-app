@@ -155,11 +155,11 @@ function closeRound(roundId, advancerIds) {
   return state;
 }
 
-// ---- בחירת שיר (הצבעה ידנית בהרמת ידיים) ----
+// ---- בחירת שיר (הצבעה ידנית בהרמת ידיים - הספירה נעשית מחוץ למערכת, המפעיל פשוט בוחר את השיר שניצח) ----
 function setupSongSelection(songNames) {
   state.songSelection = {
     id: makeId('s'),
-    songs: songNames.map((n) => ({ id: makeId('song'), name: n, count: 0 })),
+    songs: songNames.map((n) => ({ id: makeId('song'), name: n })),
     active: true,
     revealed: false,
     winnerSongId: null,
@@ -168,18 +168,12 @@ function setupSongSelection(songNames) {
   return state;
 }
 
-function setSongCount(songId, count) {
+function selectSongWinner(songId) {
   if (!state.songSelection) return state;
   const song = state.songSelection.songs.find((s) => s.id === songId);
-  if (song) song.count = Math.max(0, Number(count));
-  return state;
-}
-
-function revealSongWinner() {
-  if (!state.songSelection) return state;
-  const winner = state.songSelection.songs.slice().sort((a, b) => b.count - a.count)[0];
+  if (!song) return state;
   state.songSelection.revealed = true;
-  state.songSelection.winnerSongId = winner ? winner.id : null;
+  state.songSelection.winnerSongId = songId;
   return state;
 }
 
@@ -244,8 +238,7 @@ module.exports = {
   computeContestantScore,
   closeRound,
   setupSongSelection,
-  setSongCount,
-  revealSongWinner,
+  selectSongWinner,
   setDisplayMode,
   getContestant,
   getRoundById,

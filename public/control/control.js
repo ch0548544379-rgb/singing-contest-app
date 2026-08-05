@@ -301,27 +301,23 @@ document.getElementById('startSongBtn').addEventListener('click', () => {
   socket.emit('song:setup', { songNames: names });
 });
 
-document.getElementById('revealSongBtn').addEventListener('click', () => socket.emit('song:reveal'));
-
+// הספירה נעשית בהרמת ידיים מחוץ למערכת - לוחצים ישירות על השיר שניצח כדי לבחור אותו
 function renderSongCounters(state) {
   const wrap = document.getElementById('songCounters');
   wrap.innerHTML = '';
   if (!state.songSelection) return;
   state.songSelection.songs.forEach((s) => {
-    const div = document.createElement('div');
-    div.className = 'song-counter';
-    div.innerHTML = `<div class="name">${s.name}${state.songSelection.revealed && s.id === state.songSelection.winnerSongId ? ' 🏆' : ''}</div>
-      <div class="controls">
-        <button class="btn small minus">-</button>
-        <input type="number" value="${s.count}" min="0">
-        <button class="btn small plus">+</button>
-      </div>`;
-    const input = div.querySelector('input');
-    const update = (v) => socket.emit('song:setCount', { songId: s.id, count: Math.max(0, v) });
-    div.querySelector('.plus').addEventListener('click', () => update(Number(input.value) + 1));
-    div.querySelector('.minus').addEventListener('click', () => update(Number(input.value) - 1));
-    input.addEventListener('change', () => update(Number(input.value)));
-    wrap.appendChild(div);
+    const btn = document.createElement('button');
+    const isWinner = state.songSelection.winnerSongId === s.id;
+    btn.className = 'song-pick' + (isWinner ? ' winner' : '');
+    btn.textContent = s.name + (state.songSelection.revealed && isWinner ? ' 🏆' : '');
+    btn.disabled = state.songSelection.revealed;
+    btn.addEventListener('click', () => {
+      if (confirm(`לבחור את "${s.name}" כשיר שהקהל בחר?`)) {
+        socket.emit('song:select', { songId: s.id });
+      }
+    });
+    wrap.appendChild(btn);
   });
 }
 

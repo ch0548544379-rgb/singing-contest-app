@@ -78,13 +78,8 @@ io.on('connection', (socket) => {
     broadcastState();
   });
 
-  socket.on('song:setCount', ({ songId, count }) => {
-    S.setSongCount(songId, count);
-    broadcastState();
-  });
-
-  socket.on('song:reveal', () => {
-    S.revealSongWinner();
+  socket.on('song:select', ({ songId }) => {
+    S.selectSongWinner(songId);
     broadcastState();
   });
 

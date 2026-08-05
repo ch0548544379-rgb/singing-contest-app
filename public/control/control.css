@@ -65,9 +65,9 @@ h1 { font-size: 1.6rem; margin: 0; }
 .song-setup { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
 .song-setup input { background: rgba(0,0,0,0.35); border: 1px solid var(--muted); color: var(--text); padding: 8px 10px; border-radius: 8px; flex: 1; min-width: 160px; }
 .song-counters { display: flex; gap: 16px; flex-wrap: wrap; margin: 10px 0; }
-.song-counter { padding: 12px 16px; background: rgba(0,0,0,0.3); border-radius: 10px; text-align: center; min-width: 160px; }
-.song-counter .name { font-weight: bold; margin-bottom: 6px; }
-.song-counter .controls { display: flex; align-items: center; justify-content: center; gap: 10px; }
-.song-counter input { width: 60px; text-align: center; background: rgba(0,0,0,0.4); border: 1px solid var(--muted); color: var(--text); border-radius: 6px; padding: 4px; }
+.song-pick { padding: 14px 22px; font-size: 1.05rem; border-radius: 10px; border: 1px solid var(--accent); background: transparent; color: var(--text); cursor: pointer; min-width: 160px; }
+.song-pick:hover:not(:disabled) { background: rgba(125,92,255,0.15); }
+.song-pick.winner { border-color: var(--gold); background: rgba(242,193,78,0.15); color: var(--gold-soft); font-weight: bold; }
+.song-pick:disabled { cursor: default; opacity: 0.7; }
 
 #winnerSelect { background: rgba(0,0,0,0.35); border: 1px solid var(--muted); color: var(--text); padding: 8px 10px; border-radius: 8px; }

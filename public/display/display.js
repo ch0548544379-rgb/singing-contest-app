@@ -161,14 +161,13 @@ function render(state) {
 
   if (state.display.mode === 'songSelect' && state.songSelection) {
     const ss = state.songSelection;
-    document.getElementById('songList').innerHTML = ss.songs
-      .map(
-        (s) => `<div class="panel song-card ${ss.revealed && s.id === ss.winnerSongId ? 'winner' : ''}">
-          <div>${s.name}</div>
-          <div class="count">${s.count}</div>
-        </div>`
-      )
-      .join('');
+    const listEl = document.getElementById('songList');
+    if (ss.revealed) {
+      const winner = ss.songs.find((s) => s.id === ss.winnerSongId);
+      listEl.innerHTML = `<div class="panel song-card song-card-solo">${winner ? winner.name : ''}</div>`;
+    } else {
+      listEl.innerHTML = ss.songs.map((s) => `<div class="panel song-card">${s.name}</div>`).join('');
+    }
   }
 
   if (state.display.mode === 'winner') {
