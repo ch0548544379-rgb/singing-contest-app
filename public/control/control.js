@@ -31,9 +31,7 @@ votePhoneInput.addEventListener('input', () => {
 document.getElementById('resetRoundBtn').addEventListener('click', () => {
   const round = lastState.rounds.find((r) => r.id === lastState.currentRoundId);
   if (!round) return;
-  if (confirm(`לאפס את כל התוצאות של "${round.name}" ולחזור על הסבב מחדש (לדוגמה בגלל תקלה)? הניקוד וההצבעות שהוזנו יימחקו, אבל רשימת המשתתפים תישאר.`)) {
-    socket.emit('round:resetResults', { roundId: round.id });
-  }
+  socket.emit('round:resetResults', { roundId: round.id });
 });
 
 document.getElementById('musicMuteBtn').addEventListener('click', () => {
@@ -49,9 +47,7 @@ function renderMusicMuteBtn(state) {
 }
 
 document.getElementById('resetBtn').addEventListener('click', () => {
-  if (confirm('לאפס את כל נתוני התחרות? פעולה זו לא ניתנת לביטול.')) {
-    socket.emit('state:reset');
-  }
+  socket.emit('state:reset');
 });
 
 // ---- רשימת משתתפים ----
@@ -235,10 +231,6 @@ document.getElementById('finishRoundBtn').addEventListener('click', () => {
   if (!round) return;
   const isFinal = round.stageLevel >= 3;
   const n = isFinal ? 0 : Number(document.getElementById('advanceCount').value) || 0;
-  const msg = isFinal
-    ? 'לסיים את הסבב האחרון? לאחר מכן אפשר להכריז על הזוכה.'
-    : `לסיים את הסבב ולהעלות את ${n} המדורגים הראשונים לשלב הבא?`;
-  if (!confirm(msg)) return;
   socket.emit('round:closeAuto', { roundId: round.id, advanceCount: n });
 });
 
@@ -339,9 +331,7 @@ function renderSongCounters(state) {
     btn.textContent = s.name + (state.songSelection.revealed && isWinner ? ' 🏆' : '');
     btn.disabled = state.songSelection.revealed;
     btn.addEventListener('click', () => {
-      if (confirm(`לבחור את "${s.name}" כשיר שהקהל בחר?`)) {
-        socket.emit('song:select', { songId: s.id });
-      }
+      socket.emit('song:select', { songId: s.id });
     });
     wrap.appendChild(btn);
   });
@@ -367,9 +357,7 @@ function renderWinnerSelect(state) {
 document.getElementById('announceWinnerBtn').addEventListener('click', () => {
   const sel = document.getElementById('winnerSelect');
   if (!sel.value) return;
-  if (confirm('להכריז סופית על ' + sel.options[sel.selectedIndex].text + ' כזוכה?')) {
-    socket.emit('winner:announce', { contestantId: sel.value });
-  }
+  socket.emit('winner:announce', { contestantId: sel.value });
 });
 
 // ---- render ראשי ----
