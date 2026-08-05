@@ -168,7 +168,7 @@
     const audio = new Audio(url);
     audio.loop = !!opts.loop;
     audio.volume = 0;
-    audio.play().catch(() => {});
+    audio.play().catch((err) => console.warn('StageAudio: playback blocked for', url, err && err.message));
     currentTrack = audio;
     currentTrackVolume = targetVolume;
     fadeElementVolume(audio, 0, muted ? 0 : targetVolume, fadeMs);
