@@ -151,8 +151,17 @@ function closeRound(roundId, advancerIds) {
   round.votingOpen = false;
   round.closed = true;
   round.advancers = advancerIds || [];
-  state.display.mode = 'results';
+  // בסבב הגמר (שלב 3) אין "עולים הלאה" לחשוף - חוזרים למסך אידיאלי ושומרים על ההפתעה עד "הכרז על זוכה"
+  state.display.mode = round.stageLevel >= 3 ? 'idle' : 'results';
   return state;
+}
+
+// סוגר סבב ובוחר אוטומטית את N המדורגים הראשונים כעולים הלאה - כדי לא לדרוש בחירה ידנית בכל סבב
+function closeRoundAuto(roundId, advanceCount) {
+  const scores = getRoundScores(roundId);
+  const n = Math.max(0, Number(advanceCount) || 0);
+  const advancerIds = scores.slice(0, n).map((s) => s.contestant.id);
+  return closeRound(roundId, advancerIds);
 }
 
 // ---- בחירת שיר (הצבעה ידנית בהרמת ידיים - הספירה נעשית מחוץ למערכת, המפעיל פשוט בוחר את השיר שניצח) ----
@@ -237,6 +246,7 @@ module.exports = {
   getRoundScores,
   computeContestantScore,
   closeRound,
+  closeRoundAuto,
   setupSongSelection,
   selectSongWinner,
   setDisplayMode,

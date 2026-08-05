@@ -53,7 +53,7 @@
   <section class="panel section">
     <h2>🏆 ניהול סבב</h2>
     <div class="round-create">
-      <input id="roundName" placeholder="שם השלב, לדוגמה: שלב 1" value="שלב 1">
+      <input id="roundName" placeholder="שם השלב, לדוגמה: סבב אחד" value="סבב אחד">
       <label class="stage-label">שלב תחרות (קובע כמה דרמטי המסך והמוזיקה):
       <select id="roundStage">
         <option value="1">שלב 1 - מוקדמות (רגוע)</option>
@@ -89,11 +89,17 @@
       <div class="manual-vote-buttons" id="manualVoteButtons"></div>
 
       <div class="close-round">
-        <label>כמה עולים לשלב הבא: <input id="advanceCount" type="number" value="3" min="0" style="width:60px"></label>
-        <button id="computeRankBtn" class="btn ghost">חשב דירוג</button>
-        <div id="rankPreview"></div>
-        <button id="closeRoundBtn" class="btn primary">סגור סבב ועדכן מסך</button>
-        <button id="startNextRoundBtn" class="btn primary hidden">➡ הכן את הסבב הבא</button>
+        <div class="row wrap-row" id="advanceRow">
+          <label>כמה עולים לשלב הבא: <input id="advanceCount" type="number" value="3" min="0" style="width:60px"></label>
+        </div>
+        <button id="finishRoundBtn" class="btn primary">🏁 סיים סבב</button>
+        <details class="advanced-close" id="advancedClose">
+          <summary>אפשרויות מתקדמות (בחירה ידנית של העולים)</summary>
+          <button id="computeRankBtn" class="btn ghost">חשב דירוג</button>
+          <div id="rankPreview"></div>
+          <button id="closeRoundBtn" class="btn ghost">סגור סבב עם הבחירה הידנית</button>
+        </details>
+        <button id="startNextRoundBtn" class="btn primary hidden">➡ התחל את הסבב הבא</button>
       </div>
     </div>
   </section>

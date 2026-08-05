@@ -15,6 +15,7 @@ function setInput(page, selector, value) {
   return page.evaluate((sel, val) => {
     const el = document.querySelector(sel);
     el.value = val;
+    el.dispatchEvent(new Event('input', { bubbles: true }));
     el.dispatchEvent(new Event('change', { bubbles: true }));
   }, selector, value);
 }
@@ -72,12 +73,9 @@ async function run() {
     await clickEl(control, '#voteCloseBtn');
     await wait(150);
   }
-  await clickEl(control, '#computeRankBtn');
-  await wait(300);
   await setInput(control, '#advanceCount', '3');
-  await clickEl(control, '#computeRankBtn');
-  await wait(300);
-  await clickEl(control, '#closeRoundBtn');
+  await control.evaluate(() => { window.confirm = () => true; });
+  await clickEl(control, '#finishRoundBtn');
   await wait(300);
 
   const afterR1Close = await display.evaluate(() => ({
@@ -112,11 +110,8 @@ async function run() {
   }));
   console.log('[song select] screen state after pick (should show ONE solo card):', JSON.stringify(songScreenAfter));
 
-  // ===== ROUND 2: use the quick-fill button =====
+  // ===== ROUND 2: startNextRoundBtn now auto-creates the round with the advancers, no manual stage/create step =====
   await clickEl(control, '#startNextRoundBtn');
-  await wait(200);
-  await control.evaluate(() => { document.getElementById('roundStage').value = '2'; });
-  await clickEl(control, '#createRoundBtn');
   await wait(300);
   const round2Info = await control.evaluate(() => ({
     roundTitle: document.getElementById('roundTitle').textContent,
@@ -138,21 +133,14 @@ async function run() {
     await clickEl(control, '#voteCloseBtn');
     await wait(150);
   }
-  await clickEl(control, '#computeRankBtn');
-  await wait(300);
   await setInput(control, '#advanceCount', '2');
-  await clickEl(control, '#computeRankBtn');
-  await wait(300);
-  await clickEl(control, '#closeRoundBtn');
+  await clickEl(control, '#finishRoundBtn');
   await wait(300);
   console.log('[round2] closed ok, no crash so far. errors so far:', errors.length);
   await wait(9000);
 
-  // ===== ROUND 3 (final, stage 3) via quick-fill =====
+  // ===== ROUND 3 (final, stage 3) via auto-create =====
   await clickEl(control, '#startNextRoundBtn');
-  await wait(200);
-  await control.evaluate(() => { document.getElementById('roundStage').value = '3'; });
-  await clickEl(control, '#createRoundBtn');
   await wait(300);
 
   await control.evaluate(() => document.querySelectorAll('#performerButtons button')[0].dispatchEvent(new MouseEvent('click', { bubbles: true })));
@@ -198,7 +186,7 @@ async function run() {
     overflow: document.documentElement.scrollHeight > document.documentElement.clientHeight + 2,
   }));
   console.log('[winner] carpet running right after announce:', JSON.stringify(winnerStart));
-  await wait(2800);
+  await wait(10500); // carpet now rolls for a full 10s before the name lands
   const winnerFinal = await display.evaluate(() => ({
     nameText: document.getElementById('winnerName').textContent,
     carpetStopped: document.getElementById('carpetTrack').classList.contains('stopped'),

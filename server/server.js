@@ -73,6 +73,12 @@ io.on('connection', (socket) => {
     broadcastState();
   });
 
+  // סוגר את הסבב ובוחר אוטומטית את N המדורגים הראשונים - כפתור "סיים סבב" האחד שהמפעיל לוחץ עליו
+  socket.on('round:closeAuto', ({ roundId, advanceCount }) => {
+    S.closeRoundAuto(roundId, advanceCount);
+    broadcastState();
+  });
+
   socket.on('song:setup', ({ songNames }) => {
     S.setupSongSelection(songNames);
     broadcastState();

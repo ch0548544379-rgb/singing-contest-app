@@ -16,27 +16,28 @@ html, body { width: 100%; height: 100%; overflow: hidden; }
 .performer-name { font-size: clamp(3.2rem, 11vh, 7rem); margin: 0.6vh 0; }
 .performer-name-sm { font-size: clamp(2rem, 7vh, 4.5rem); margin: 0.3vh 0; }
 
-.vote-histogram { display: flex; align-items: flex-end; justify-content: center; gap: 14px; height: clamp(100px, 18vh, 260px); margin: 1vh auto; }
-.vote-bar-wrap { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; width: 60px; }
+.vote-histogram { display: flex; align-items: flex-end; justify-content: center; gap: 12px; height: clamp(70px, 12vh, 180px); margin: 0.6vh auto; }
+.vote-bar-wrap { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; width: 54px; }
 .vote-bar { width: 100%; background: linear-gradient(180deg, var(--gold), var(--accent)); border-radius: 8px 8px 0 0; transition: height 0.35s ease; box-shadow: 0 0 18px rgba(242,193,78,0.5); }
-.vote-bar-label { margin-top: 6px; color: var(--muted); font-size: clamp(0.85rem, 1.8vh, 1.2rem); }
+.vote-bar-label { margin-top: 6px; color: var(--muted); font-size: clamp(0.8rem, 1.6vh, 1.1rem); }
 
-.vote-stats { display: flex; justify-content: center; gap: clamp(24px, 6vw, 60px); margin-top: 0.6vh; }
+.vote-stats { display: flex; justify-content: center; gap: clamp(24px, 6vw, 60px); margin-top: 0.4vh; }
 .stat { display: flex; flex-direction: column; }
-.stat-num { font-size: clamp(1.8rem, 4.4vh, 3.2rem); color: var(--gold-soft); font-weight: bold; }
-.stat-label { color: var(--muted); font-size: clamp(0.85rem, 1.8vh, 1.2rem); }
-.judges-live { font-size: clamp(1rem, 2.4vh, 1.6rem); color: var(--gold-soft); margin: 0.4vh 0; }
-.judges-live span { font-weight: bold; font-size: clamp(1.3rem, 3vh, 2rem); }
+.stat-num { font-size: clamp(1.6rem, 3.6vh, 2.6rem); color: var(--gold-soft); font-weight: bold; }
+.stat-label { color: var(--muted); font-size: clamp(0.8rem, 1.6vh, 1.1rem); }
+.judges-live { font-size: clamp(1.1rem, 2.6vh, 1.7rem); color: var(--gold-soft); margin: 0.3vh 0; }
+.judges-live span { font-weight: bold; font-size: clamp(2.2rem, 6.5vh, 4.2rem); text-shadow: 0 0 16px rgba(242,193,78,0.5); }
 
-.points-gauge-wrap { width: min(700px, 70vw); margin: 0.8vh auto 0; }
-.points-gauge { height: clamp(14px, 2.6vh, 22px); border-radius: 999px; background: rgba(255,255,255,0.08); border: 1px solid rgba(242,193,78,0.35); overflow: hidden; }
+.points-gauge-wrap { width: min(700px, 70vw); margin: 0.6vh auto 0; }
+.points-gauge { height: clamp(12px, 2.2vh, 18px); border-radius: 999px; background: rgba(255,255,255,0.08); border: 1px solid rgba(242,193,78,0.35); overflow: hidden; }
 .points-gauge-fill { height: 100%; width: 0%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--gold)); box-shadow: 0 0 16px rgba(242,193,78,0.6); transition: width 0.5s cubic-bezier(.22,1,.36,1); }
-.points-label { margin-top: 0.4vh; font-size: clamp(0.95rem, 2.1vh, 1.3rem); color: var(--gold-soft); }
-.points-label span { font-weight: bold; }
+.points-label { margin-top: 0.3vh; font-size: clamp(1rem, 2.2vh, 1.4rem); color: var(--gold-soft); }
+.points-label span { font-weight: bold; font-size: clamp(1.9rem, 5.5vh, 3.6rem); text-shadow: 0 0 16px rgba(242,193,78,0.5); }
+.total-score-live { margin-top: 0.5vh; font-size: clamp(2.2rem, 6.5vh, 4.4rem); color: var(--gold); font-weight: bold; text-shadow: 0 0 20px rgba(242,193,78,0.65); }
 
-.call-cta { font-size: clamp(1.2rem, 3vh, 2rem); margin-top: 0.8vh; color: var(--accent2); animation: pulseText 1.2s infinite; }
+.call-cta { font-size: clamp(1.1rem, 2.6vh, 1.8rem); margin-top: 0.5vh; color: var(--accent2); animation: pulseText 1.2s infinite; }
 @keyframes pulseText { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
-.vote-phone { font-size: clamp(1.4rem, 3.6vh, 2.4rem); margin-top: 0.4vh; color: var(--gold-soft); font-weight: bold; direction: ltr; letter-spacing: 2px; }
+.vote-phone { font-size: clamp(1.8rem, 4.4vh, 3rem); margin-top: 0.4vh; padding: clamp(4px,1vh,10px) clamp(16px,3vw,28px); border-radius: 14px; background: rgba(242,193,78,0.14); border: 2px solid var(--gold); color: var(--gold-soft); font-weight: bold; direction: ltr; letter-spacing: 2px; display: inline-block; }
 
 .sting-flash { position: fixed; inset: 0; z-index: 40; background: radial-gradient(circle, rgba(242,193,78,0.35), transparent 70%); opacity: 0; pointer-events: none; transition: opacity 0.15s ease; }
 .sting-flash.on { opacity: 1; animation: stingPulse 1.5s ease; }

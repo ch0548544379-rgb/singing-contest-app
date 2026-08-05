@@ -2,6 +2,7 @@ const socket = io();
 let lastState = null;
 let selectedParticipantIds = new Set();
 let lastRankPreview = null;
+const ROUND_ORDINALS = ['', 'אחד', 'שתיים', 'שלישי', 'רביעי', 'חמישי'];
 
 // ---- כתובות אינטגרציה לימות המשיח ----
 document.getElementById('urlVote').textContent = location.origin + '/api/yemot/';
@@ -23,7 +24,7 @@ document.getElementById('soundStartBtn').addEventListener('click', () => {
 setInterval(() => { fetch('/').catch(() => {}); }, 10 * 60 * 1000);
 
 const votePhoneInput = document.getElementById('votePhoneInput');
-votePhoneInput.addEventListener('change', () => {
+votePhoneInput.addEventListener('input', () => {
   socket.emit('config:setVotePhoneNumber', { number: votePhoneInput.value.trim() });
 });
 
@@ -206,27 +207,52 @@ function renderRoundPanel(state) {
 
   renderManualVoteButtons(state, round);
 
+  const isFinal = round.stageLevel >= 3;
+  const ordinal = ROUND_ORDINALS[round.stageLevel] || round.stageLevel;
+  document.getElementById('advanceRow').classList.toggle('hidden', isFinal);
+  document.getElementById('advancedClose').classList.toggle('hidden', isFinal);
+
+  const finishBtn = document.getElementById('finishRoundBtn');
+  if (round.closed) {
+    finishBtn.classList.add('hidden');
+  } else {
+    finishBtn.classList.remove('hidden');
+    finishBtn.textContent = isFinal ? '🏁 סיים סבב ' + ordinal : '🏁 סיים סבב ' + ordinal + ' וגלה את העולים';
+  }
+
   const nextBtn = document.getElementById('startNextRoundBtn');
   if (round.closed && round.advancers.length) {
+    const nextStage = Math.min(3, round.stageLevel + 1);
     nextBtn.classList.remove('hidden');
-    nextBtn.textContent = `➡ הכן את הסבב הבא עם ${round.advancers.length} המדורגים`;
+    nextBtn.textContent = `➡ התחל סבב ${ROUND_ORDINALS[nextStage] || nextStage} עם ${round.advancers.length} המדורגים`;
   } else {
     nextBtn.classList.add('hidden');
   }
 }
 
-// ממלא אוטומטית את בוחר המשתתפים עם העולים מהסבב שנסגר, ומציע שם לסבב הבא -
-// כדי לא לחזור ולסמן ידנית את אותם שמות שכבר נבחרו בחישוב הדירוג.
+document.getElementById('finishRoundBtn').addEventListener('click', () => {
+  const round = lastState.rounds.find((r) => r.id === lastState.currentRoundId);
+  if (!round) return;
+  const isFinal = round.stageLevel >= 3;
+  const n = isFinal ? 0 : Number(document.getElementById('advanceCount').value) || 0;
+  const msg = isFinal
+    ? 'לסיים את הסבב האחרון? לאחר מכן אפשר להכריז על הזוכה.'
+    : `לסיים את הסבב ולהעלות את ${n} המדורגים הראשונים לשלב הבא?`;
+  if (!confirm(msg)) return;
+  socket.emit('round:closeAuto', { roundId: round.id, advanceCount: n });
+});
+
+// יוצר אוטומטית את הסבב הבא עם העולים מהסבב שנסגר - בלי לבחור שוב ידנית את אותם שמות.
 document.getElementById('startNextRoundBtn').addEventListener('click', () => {
   const round = lastState.rounds.find((r) => r.id === lastState.currentRoundId);
-  if (!round || !round.closed) return;
-  selectedParticipantIds = new Set(round.advancers);
-  const m = round.name.match(/(\d+)\s*$/);
-  document.getElementById('roundName').value = m
-    ? round.name.replace(/\d+\s*$/, String(Number(m[1]) + 1))
-    : round.name + ' - שלב הבא';
-  renderParticipantPicker(lastState);
-  document.getElementById('roundName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  if (!round || !round.closed || !round.advancers.length) return;
+  const nextStage = Math.min(3, round.stageLevel + 1);
+  socket.emit('round:create', {
+    name: 'סבב ' + (ROUND_ORDINALS[nextStage] || nextStage),
+    stageLevel: nextStage,
+    participantIds: round.advancers,
+    judgesMax: round.judgesMax,
+  });
 });
 
 function renderManualVoteButtons(state, round) {

@@ -166,6 +166,7 @@ function render(state) {
     document.getElementById('pointsGaugeFill').style.width = (pct * 100).toFixed(1) + '%';
     document.getElementById('audiencePoints').textContent = norm.toFixed(1);
     document.getElementById('audiencePointsMax').textContent = round.judgesMax;
+    document.getElementById('totalScoreValue').textContent = ((r.judgesTotal || 0) + norm).toFixed(1);
     StageAudio.setVoteHeat(pct);
 
     const phoneEl = document.getElementById('votePhoneDisplay');
@@ -295,7 +296,7 @@ function playWinnerSequence(name) {
     void nameEl.offsetWidth;
     nameEl.classList.add('landing');
     StageEffects.burst(null, null, 30);
-  }, 2400);
+  }, 10000);
 }
 
 socket.on('state:full', render);

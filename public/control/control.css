@@ -61,6 +61,9 @@ h1 { font-size: 1.6rem; margin: 0; }
 #rankPreview { display: flex; flex-direction: column; gap: 4px; width: 100%; margin: 8px 0; }
 .rank-row { display: flex; justify-content: space-between; padding: 6px 12px; background: rgba(0,0,0,0.3); border-radius: 6px; }
 .rank-row label { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+.advanced-close { width: 100%; margin-top: 6px; color: var(--muted); }
+.advanced-close summary { cursor: pointer; color: var(--gold-soft); }
+.advanced-close > *:not(summary) { margin-top: 8px; }
 
 .song-setup { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
 .song-setup input { background: rgba(0,0,0,0.35); border: 1px solid var(--muted); color: var(--text); padding: 8px 10px; border-radius: 8px; flex: 1; min-width: 160px; }
